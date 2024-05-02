@@ -1,0 +1,18 @@
+Definir conteúdo:
+- Chave : inteiro
+- Dado1 : longint
+- Dado2 : string[1000]
+- Dado3 : string[5000]
+
+Arquivo header:
+
+
+Arquivo principal:
+- main
+- menu de opção (escolhe qual método vai ser usado)
+
+Métodos de pesquisa:
+- Acesso Sequencial Indexado
+- Árvore Binária de Pesquisa (adequada à memória externa)
+- Árvore B
+- Árvore B*
