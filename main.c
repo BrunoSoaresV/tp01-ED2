@@ -19,62 +19,82 @@ int main(int argc, char *argv[]){
     if(EntradaInvalida(argc, metodo, quantidade, situacao, chave) || ChaveInvalida(argv[4])){
         return 0;
     }
+    FILE *arq;
 
-    switch (metodo)
-    {
-    case 1:
-        int pos;
-        FILE *arq;
-
-        Registro x;
-        x.chave = chave;
-        tipoindice *tabela;
-        tabela = (tipoindice*) malloc(quantidade * sizeof(tipoindice));
-        
-
-        // escolhe qual arquivo será aberto
-        switch (quantidade)
+    //Escolhe qual arquivo será aberto
+    switch (quantidade)
         {
         case 100:
             if(situacao == 1){
-                if ((arq = fopen("registrosCem.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosCem.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }else if(situacao == 2){
-                if ((arq = fopen("registrosCem.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosCemD.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else{
+                if ((arq = fopen("registros/registrosCem.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }
             break;
         case 1000:
             if(situacao == 1){
-                if ((arq = fopen("registrosMil.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosMil.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }else if(situacao == 2){
-                if ((arq = fopen("registrosMil.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else{
+                if ((arq = fopen("registros/registrosMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }
+            break;
+        case 10000:
+            if(situacao == 1){
+                if ((arq = fopen("registros/registrosDezMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else if(situacao == 2){
+                if ((arq = fopen("registros/registrosDezMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else{
+                if ((arq = fopen("registros/registrosDezMil.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }
             break;
         case 100000:
             if(situacao == 1){
-                if ((arq = fopen("registrosCemMil.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosCemMil.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }else if(situacao == 2){
-                if ((arq = fopen("registrosCemMil.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosCemMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else{
+                if ((arq = fopen("registros/registrosCemMil.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }
             break;
         case 1000000:
             if(situacao == 1){
-                if ((arq = fopen("registrosMilhao.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosUmMilhao.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }else if(situacao == 2){
-                if ((arq = fopen("registrosMilhao.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosUmMilhao.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else{
+                if ((arq = fopen("registros/registrosUmilhao.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }
@@ -84,6 +104,16 @@ int main(int argc, char *argv[]){
             break;
         }
 
+    // escolhe o método
+    switch (metodo)
+    {
+    case 1:
+        int pos;
+        Registro x;
+        x.chave = chave;
+        tipoindice *tabela;
+        tabela = (tipoindice*) malloc(quantidade * sizeof(tipoindice));
+        
         // gera tabela de índices
         geraTabela(tabela, &pos, x, arq);
 

@@ -12,7 +12,7 @@ typedef struct {
 
 int main() {
     // Abrindo o arquivo binário para escrita
-    FILE *arquivo = fopen("registrosCem.bin", "wb");
+    FILE *arquivo = fopen("registrosCemD.bin", "wb");
 
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
@@ -20,11 +20,11 @@ int main() {
     }
 
     // Gerando 100 registros aleatórios
-    for (int i = 0; i < 100; i++) {
+    for (int i = 100; i > 0; i++) {
         Registro registro;
 
         // Definindo valores aleatórios para o registro
-        registro.chave = i + 1;
+        registro.chave = i;
         registro.dado1 = rand();
         
         // Preenchendo os dados 2 e 3 com caracteres aleatórios

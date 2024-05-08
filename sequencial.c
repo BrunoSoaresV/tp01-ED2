@@ -67,4 +67,3 @@ void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq) {
         fseek(arq, (ITENSPAGINA-1)* sizeof(x), 1);
     } 
 }
-

@@ -7,7 +7,6 @@
 
 // definição de uma entrada da tabela de índice das páginas
 typedef struct {
-    int posicao;
     int chave;
 } tipoindice;
 
