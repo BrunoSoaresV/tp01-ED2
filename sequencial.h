@@ -4,7 +4,6 @@
 #include "struct.h"
 
 #define ITENSPAGINA 4
-#define MAXTABELA 100
 
 // definição de uma entrada da tabela de índice das páginas
 typedef struct {
@@ -12,7 +11,7 @@ typedef struct {
     int chave;
 } tipoindice;
 
-int pesquisa(tipoindice tab[], int tam, Registro* item, FILE *arq);
+int pesquisa(tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao);
 void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq);
 
 #endif

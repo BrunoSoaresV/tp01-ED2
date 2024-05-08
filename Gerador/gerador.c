@@ -12,7 +12,7 @@ typedef struct {
 
 int main() {
     // Abrindo o arquivo binário para escrita
-    FILE *arquivo = fopen("registros.bin", "wb");
+    FILE *arquivo = fopen("registrosCem.bin", "wb");
 
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
@@ -41,6 +41,7 @@ int main() {
         // Escrevendo o registro no arquivo
         fwrite(&registro, sizeof(Registro), 1, arquivo);
     }
+
 
     // Fechando o arquivo
     fclose(arquivo);

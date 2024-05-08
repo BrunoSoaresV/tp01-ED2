@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int chave);
-bool Chaveinvalida(const char* chave);
+bool ChaveInvalida(const char* chave);
 
 int main(int argc, char *argv[]){
 
@@ -15,8 +15,8 @@ int main(int argc, char *argv[]){
     int quantidade = atoi(argv[2]);
     int situacao = atoi(argv[3]);
     int chave = atoi(argv[4]);
-
-    if(EntradaInvalida(argc, metodo, quantidade, situacao, chave) || Chaveinvalida(argv[4])){
+    printf("Teste da MAIN\n");
+    if(EntradaInvalida(argc, metodo, quantidade, situacao, chave) || ChaveInvalida(argv[4])){
         return 0;
     }
 
@@ -25,20 +25,70 @@ int main(int argc, char *argv[]){
     case 1:
         int pos;
         FILE *arq;
-        // abre o arquivo de dados
-        if ((arq = fopen("registros.bin","rb")) == NULL) {
-            printf("Erro na abertura do arquivo\n"); return 0;
-        }
 
         Registro x;
         x.chave = chave;
-        tipoindice tabela[MAXTABELA];
+        tipoindice *tabela;
+        tabela = (tipoindice*) malloc(quantidade * sizeof(tipoindice));
+        
 
+        // escolhe qual arquivo será aberto
+        switch (quantidade)
+        {
+        case 100:
+            if(situacao == 1){
+                if ((arq = fopen("registrosCem.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else if(situacao == 2){
+                if ((arq = fopen("registrosCem.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }
+            break;
+        case 1000:
+            if(situacao == 1){
+                if ((arq = fopen("registrosMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else if(situacao == 2){
+                if ((arq = fopen("registrosMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }
+            break;
+        case 100000:
+            if(situacao == 1){
+                if ((arq = fopen("registrosCemMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else if(situacao == 2){
+                if ((arq = fopen("registrosCemMil.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }
+            break;
+        case 1000000:
+            if(situacao == 1){
+                if ((arq = fopen("registrosMilhao.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }else if(situacao == 2){
+                if ((arq = fopen("registrosMilhao.bin","rb")) == NULL) {
+                    printf("Erro na abertura do arquivo\n"); return 0;
+                }
+            }
+            break;
+        default:
+            printf("Não foi possível chamar nenhuma abertura de arquivo\n");
+            break;
+        }
+
+        // gera tabela de índices
         geraTabela(tabela, &pos, x, arq);
-        pesquisa(tabela, pos, &x, arq);
 
         // ativa a função de pesquisa
-        if (pesquisa (tabela, pos, &x, arq))
+        if (pesquisa (tabela, pos, &x, arq, situacao))
             printf ("Registro (codigo %d) foi localizado",x.chave);
         else
             printf ("Registro de código %d nao foi localizado",x.chave);
@@ -102,7 +152,7 @@ bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int cha
 }
 
 
-bool Chaveinvalida(const char *chave){
+bool ChaveInvalida(const char *chave){
     //verifica se a chave está vazia
     if(*chave == '\0'){
         printf("\nChave inválida: A chave não pode ser uma string vazia. ");
