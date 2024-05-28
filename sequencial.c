@@ -25,7 +25,7 @@ int pesquisa (tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao
             if(quantitens == 0) quantitens = ITENSPAGINA; 
         }
         // lê a página desejada do arquivo
-        desloc = ((tab[i-1].posicao-1)*ITENSPAGINA*sizeof(Registro));
+        desloc = (i-1)*ITENSPAGINA*sizeof(Registro);
 
         fseek (arq, desloc, SEEK_SET);
         fread (&pagina, sizeof(Registro), quantitens, arq);
@@ -62,7 +62,6 @@ void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq) {
     while (fread(&x, sizeof(x), 1, arq) == 1) {
         
         tabela[*pos].chave = x.chave;
-        tabela[*pos].posicao = *pos+1;
         (*pos)++;
         fseek(arq, (ITENSPAGINA-1)* sizeof(x), 1);
     } 

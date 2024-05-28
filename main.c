@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "sequencial.h"
 #include "struct.h"
+#include "binaria.h"
 #include <unistd.h>
 
 bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int chave);
@@ -15,6 +16,12 @@ int main(int argc, char *argv[]){
     int quantidade = atoi(argv[2]);
     int situacao = atoi(argv[3]);
     int chave = atoi(argv[4]);
+
+    tNo no; // para uso da árvore binária
+    Registro dado;
+    int posNaArvore;
+    FILE *arvore;
+
     printf("Teste da MAIN\n");
     if(EntradaInvalida(argc, metodo, quantidade, situacao, chave) || ChaveInvalida(argv[4])){
         return 0;
@@ -34,7 +41,7 @@ int main(int argc, char *argv[]){
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }else{
-                if ((arq = fopen("registros/registrosCem.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosCemO.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }
@@ -94,7 +101,7 @@ int main(int argc, char *argv[]){
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }else{
-                if ((arq = fopen("registros/registrosUmilhao.bin","rb")) == NULL) {
+                if ((arq = fopen("registros/registrosUmMilhao.bin","rb")) == NULL) {
                     printf("Erro na abertura do arquivo\n"); return 0;
                 }
             }
@@ -104,12 +111,13 @@ int main(int argc, char *argv[]){
             break;
         }
 
+
+    int pos;
+    Registro x;
     // escolhe o método
     switch (metodo)
     {
     case 1:
-        int pos;
-        Registro x;
         x.chave = chave;
         tipoindice *tabela;
         tabela = (tipoindice*) malloc(quantidade * sizeof(tipoindice));
@@ -127,7 +135,29 @@ int main(int argc, char *argv[]){
         
         break;
     
+    // organização e pesquisa por árvore binária
     case 2:
+        x.chave = chave;
+
+        geraArquivoBinaria(arq, quantidade);
+
+        if((arvore = fopen("treefile.bin", "rb")) == NULL){
+            printf("Erro na abertura do arquivo árvore pela main\n");
+            return 0;
+        }
+        
+        posNaArvore = buscaBinaria(arvore, 0, no, chave, &dado);
+
+        if(posNaArvore != -1){
+            printf("O elemento procurado está na posição %d\n", posNaArvore+1);
+            printf("O elemento buscado é:\n");
+            printf("Chave: %d\n", dado.chave);
+            printf("Dado1: %ld\n", dado.dado1);
+            printf("Dado2: %s\n", dado.dado2);
+            printf("Dado3: %s\n\n", dado.dado3);
+        }
+        
+
         //árvore binária
         break;
     case 3:
