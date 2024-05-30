@@ -69,14 +69,14 @@ int main() {
     srand(time(NULL));
 
     // Abrindo o arquivo binário para escrita
-    FILE *arquivoBin = fopen("registrosCemO.bin", "wb");
+    FILE *arquivoBin = fopen("registrosDezMilO.bin", "wb");
     if (arquivoBin == NULL) {
         printf("Erro ao abrir o arquivo binário.\n");
         return 1;
     }
 
     // Abrindo o arquivo de texto para escrita
-    FILE *arquivoTxt = fopen("registrosCemO.txt", "w");
+    FILE *arquivoTxt = fopen("registrosDezMilO.txt", "w");
     if (arquivoTxt == NULL) {
         printf("Erro ao abrir o arquivo de texto.\n");
         fclose(arquivoBin);
@@ -84,16 +84,16 @@ int main() {
     }
 
     // Gerando um array com chaves de 1 a 100
-    int chaves[100];
-    for (int i = 0; i < 100; i++) {
+    int chaves[10000];
+    for (int i = 0; i < 10000; i++) {
         chaves[i] = i + 1;
     }
 
     // Embaralhando as chaves
-    shuffle(chaves, 100);
+    shuffle(chaves, 10000);
 
     // Gerando 100 registros aleatórios com chaves únicas
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10000; i++) {
         Registro registro;
 
         // Definindo valores para o registro

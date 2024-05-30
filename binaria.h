@@ -12,8 +12,9 @@ typedef struct{
 }tNo;
 
 tNo criaNovoNo(Registro dados);
-bool geraArquivoBinaria(FILE* origem, int quantidade);
-bool insere(Registro dado, int qtdItens, FILE* arvore);
-int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado);
+bool geraArquivoBinaria(FILE* origem, int quantidade, long int *transf, long int *escrita);
+bool insere(Registro dado, int qtdItens, FILE* arvore, long int *transf, long int *escrita);
+void imprimeArvore(FILE*, int);
+int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, long int *leit);
 
 #endif

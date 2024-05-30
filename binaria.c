@@ -24,7 +24,7 @@ int calcularQuantidadeRegistros(FILE *arquivo) {
 //Os elementos do arquivo são percorridos e inseridos no novo arquivo
 // Inserir enquanto tiver registros e páginas
 // a última página tem o total de registros menos o quanto já foram inseridos (qtd de páginas * qtd por página)
-bool geraArquivoBinaria(FILE* origem, int quantidade){
+bool geraArquivoBinaria(FILE* origem, int quantidade, long int *leit, long int *escrita){
     Registro dados[ITENSPAGINA];
     FILE* arvore;
     FILE* txtFile;
@@ -52,26 +52,21 @@ bool geraArquivoBinaria(FILE* origem, int quantidade){
     printf("Gerando arquivo da árvore binária\n");
 
     while(paginaAtual < totalPaginas){
-        if(paginaAtual == totalPaginas) qtdItensPag = quantidade - (paginaAtual*ITENSPAGINA);
+        if(paginaAtual == totalPaginas - 1) qtdItensPag = quantidade - (paginaAtual*ITENSPAGINA);
         if(qtdItensPag == 0) qtdItensPag = ITENSPAGINA;
 
-        if(fread(&dados, sizeof(Registro), qtdItensPag, origem) == 0){
+        if(fread(&dados, sizeof(Registro), qtdItensPag, origem) != qtdItensPag){
+            
             printf("Quantidade de arquivos na página %d \n", qtdItensPag);
             printf("Erro fatal ao tentar ler dado no arquivo de origem\n");
             return false;
-        };
+        }else (*leit)++;
 
         for(int i = 0; i < qtdItensPag; i++) {
-            insere(dados[i], qtdItens, arvore);
-
-            fprintf(txtFile, "Registro %d:\n", qtdItens + 1);
-            fprintf(txtFile, "Chave: %d\n", dados[i].chave);
-            fprintf(txtFile, "Dado1: %ld\n", dados[i].dado1);
-            fprintf(txtFile, "Dado2: %s\n", dados[i].dado2);
-            fprintf(txtFile, "Dado3: %s\n\n", dados[i].dado3);
+            insere(dados[i], qtdItens, arvore, leit, escrita);
 
             qtdItens++;
-            printf("Quantidade de itens na árvore: %d\n", qtdItens);
+            //printf("Quantidade de itens na árvore: %d\n", qtdItens);
             //Colocar um return booleano na insere, ou fazer a verificação de erro nela mesma?
         }
         paginaAtual++;
@@ -82,7 +77,7 @@ bool geraArquivoBinaria(FILE* origem, int quantidade){
     return true; //Arquivo árvore gerado com sucesso
 }
 
-bool insere(Registro dado, int qtdItens, FILE* arvore){
+bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int *escrita){
     // o dado recebido é atribuído a um nó
     tNo novoNo, noAtual;
     novoNo = criaNovoNo(dado);
@@ -90,7 +85,8 @@ bool insere(Registro dado, int qtdItens, FILE* arvore){
 
     // caso a árvore ainda não tenha itens, este será o primeiro item dela
     if(qtdItens == 0){
-        if(fwrite(&novoNo, sizeof(tNo), 1, arvore) == 0) return false;
+        if(fwrite(&novoNo, sizeof(tNo), 1, arvore) != 1) return false;
+        (*escrita)++;
         return true;
     }
 
@@ -104,16 +100,17 @@ bool insere(Registro dado, int qtdItens, FILE* arvore){
 
     while(!dadoInserido){
         posAtual = ftell(arvore);
-        // le o nó atual
 
+        // le o nó atual
         if (fread(&noAtual, sizeof(tNo), 1, arvore) != 1) {
+            
             if (feof(arvore)) {
                 printf("Reached end of file unexpectedly.\n");
             } else if (ferror(arvore)) {
                 perror("Error reading from file");
             }
             return false;
-        }
+        }else (*leit)++;
 
         // compara se o novo é maior. 
         if(novoNo.dados.chave > noAtual.dados.chave){
@@ -124,14 +121,21 @@ bool insere(Registro dado, int qtdItens, FILE* arvore){
                 // volta o ponteiro do arquivo
                 fseek(arvore, posAtual, SEEK_SET);
                 // grava o nó corrente atualizado
-                fwrite(&noAtual, sizeof(tNo), 1, arvore);
+                if((fwrite(&noAtual, sizeof(tNo), 1, arvore)) != 1){
+                    printf("Falha em sobrescrever dado no arquivo\n");
+                    return false;
+                }
+                (*escrita)++;
                 // grava o novo nó no fim do arquivo
                 fseek(arvore, 0, SEEK_END);
-                fwrite(&novoNo, sizeof(tNo), 1, arvore);
+                if((fwrite(&novoNo, sizeof(tNo), 1, arvore)) != 1){
+                    printf("Falha em adicionar dado no arquivo\n");
+                    return false;
+                }
+                (*escrita)++;
                 dadoInserido = true;
 
             }else{ //Se tiver filho, se move para ele e continua a verificação
-                rewind(arvore);
                 fseek(arvore, noAtual.dir * sizeof(tNo), SEEK_SET);
             }
             
@@ -143,14 +147,21 @@ bool insere(Registro dado, int qtdItens, FILE* arvore){
                 // volta o ponteiro do arquivo em uma posição
                 fseek(arvore, posAtual, SEEK_SET);
                 // grava o nó corrente atualizado
-                fwrite(&noAtual, sizeof(tNo), 1, arvore);
+                if((fwrite(&noAtual, sizeof(tNo), 1, arvore)) != 1){
+                    printf("Falha em sobrescrever dado no arquivo\n");
+                    return false;
+                }
+                (*escrita)++;
                 // grava o novo nó no fim do arquivo
                 fseek(arvore, 0, SEEK_END);
-                fwrite(&novoNo, sizeof(tNo), 1, arvore);
+                if((fwrite(&novoNo, sizeof(tNo), 1, arvore)) != 1){
+                    printf("Falha em adicionar dado no arquivo\n");
+                    return false;
+                }
+                (*escrita)++;
                 dadoInserido = true;
 
             }else{ //Se tiver filho, se move para ele e continua a verificação
-                rewind(arvore);
                 fseek(arvore, noAtual.esq * sizeof(tNo), SEEK_SET);
             }
 
@@ -162,32 +173,65 @@ bool insere(Registro dado, int qtdItens, FILE* arvore){
     }
 
     return true;
-    //Rest of the code yet to do
 }
 
-int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado){
+
+int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, long int *leit){
+
+    // move o ponteiro do arquivo para o nó que será lido
     fseek(arvore, posAtual * sizeof(tNo), SEEK_SET);
+
+    // lê o dado armazenado na posição
     if(fread(&no, sizeof(tNo), 1, arvore) == 0){
         printf("Erro na leitura do arquivo da árvore\n");
         return -1;
-    }
+    }else (*leit)++;
 
+    // compara a chave lida com a chave buscada
     if(no.dados.chave == chave){
         *dado = no.dados;
         return posAtual;
+    
+    // se a chave buscada for maior, continua buscando à direita
     }else if(no.dados.chave < chave){
-        if(no.dir == -1 ){
+        if(no.dir == -1 ){ // não há mais onde buscar, o elemento não está presente
             printf("O elemento de chave %d não está presente no arquivo\n", chave);
             return -1;
         }else{
-            return buscaBinaria(arvore, no.dir, no, chave, dado);
+            return buscaBinaria(arvore, no.dir, no, chave, dado, leit);
         }
+
+    // se a chave buscada for menor, continua buscando à esquerda
     }else{
-        if(no.esq == -1){
+        if(no.esq == -1){ // não há mais onde buscar, o elemento não está presente
             printf("O elemento de chave %d não está presente no arquivo\n", chave);
             return -1;
         }
+        return buscaBinaria(arvore, no.esq, no, chave, dado, leit); 
+    }
+}
 
-        return buscaBinaria(arvore, no.esq, no, chave, dado); 
+// Imprime a árvore binária em um arquivo, no formato texto
+void imprimeArvore(FILE* arvore, int qtd){
+    FILE* txtFile;
+    tNo no;
+
+    // abre o arquivo texto
+    if((txtFile = fopen("treefile.txt", "w")) == NULL){
+        printf("Erro ao abrir arquivo para leitura (imprimeArvore)\n");
+    }
+
+    // imprime os dados da árvore
+    for(int i = 0; i < qtd; i++){
+        if(fread(&no, 1, sizeof(tNo), arvore) == -1){
+            printf("Erro lendo da árvore (imprimeArvore)\n");
+        }
+        fprintf(txtFile, "Registro %d:\n", i);
+        fprintf(txtFile, "Chave: %d\n", no.dados.chave);
+        fprintf(txtFile, "Dado1: %ld\n", no.dados.dado1);
+        fprintf(txtFile, "Dado2: %.10s\n", no.dados.dado2);
+        fprintf(txtFile, "Dado3: %.10s\n", no.dados.dado3);
+        fprintf(txtFile, "Dir: %d\n", no.dir);
+        fprintf(txtFile, "Esq: %d\n\n", no.esq);
     }
 }
