@@ -26,6 +26,10 @@
 bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int chave);
 bool ChaveInvalida(const char* chave);
 FILE* abreArquivo(int, int);
+bool arquivoContagens(int fase, int qtd, int sit, char metodo[], TipoContador cont);
+void iniciaContador(TipoContador *cont);
+char *retornaSituacao(int situacao);
+char *retornaQuantidade(int quantidade);
 
 int main(int argc, char *argv[]){
 
@@ -35,12 +39,12 @@ int main(int argc, char *argv[]){
     int situacao = atoi(argv[3]);
     int chave = atoi(argv[4]);
 
-    // variáveis para controle de transferências
-    long int leit = 0, escrita = 0, transf;
-
-    // variáveis para controle de tempo
+    // variáveis para controle de transferências e de tempo
+    TipoContador construcao, busca;
+    iniciaContador(&construcao);
+    iniciaContador(&busca);
     clock_t start, end;
-    double tempo_criacao, tempo_busca;
+
 
     // variáveis para uso do método 2 (árvore binária)
     tNo no; 
@@ -73,7 +77,7 @@ int main(int argc, char *argv[]){
         start = clock();
         geraTabela(tabela, &pos, x, arq);
         end = clock();
-        tempo_criacao = ((double) (end - start)) / CLOCKS_PER_SEC;
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
 
         // ativa a função de pesquisa
         start = clock();
@@ -82,7 +86,7 @@ int main(int argc, char *argv[]){
         else
             printf ("Registro de código %d nao foi localizado",x.chave);
         end = clock();
-        tempo_busca = ((double) (end - start)) / CLOCKS_PER_SEC;
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
 
 
         fclose (arq);
@@ -95,9 +99,12 @@ int main(int argc, char *argv[]){
 
         // gera a árvore binária
         start = clock();
-        geraArquivoBinaria(arq, quantidade, &leit, &escrita);
+        geraArquivoBinaria(arq, quantidade, &construcao.leitura, &construcao.escrita);
         end = clock();
-        tempo_criacao = ((double) (end - start)) / CLOCKS_PER_SEC;
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        if((arquivoContagens(1, quantidade, situacao, "arvBin\0", construcao)) == false){
+            printf("Erro ao gerar arquivo de contagens (Construção : Árvore Binária)");
+        }
 
         if((arvore = fopen("treefile.bin", "rb")) == NULL){
             printf("Erro na abertura do arquivo árvore pela main\n");
@@ -108,9 +115,12 @@ int main(int argc, char *argv[]){
 
         // busca o arquivo na árvore
         start = clock();
-        posNaArvore = buscaBinaria(arvore, 0, no, chave, &dado, &leit);
+        posNaArvore = buscaBinaria(arvore, 0, no, chave, &dado, &busca.leitura);
         end = clock();
-        tempo_busca = ((double) (end - start)) / CLOCKS_PER_SEC;
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        if((arquivoContagens(2, quantidade, situacao, "arvBin\0",  busca)) == false){
+            printf("Erro ao gerar arquivo de contagens (Busca : Árvore Binária)");
+        }
 
         if(posNaArvore != -1){
             printf("\nO elemento procurado está na posição %d\n", posNaArvore+1);
@@ -121,10 +131,6 @@ int main(int argc, char *argv[]){
             printf("Dado3: %.10s...\n", dado.dado3);
         }
 
-        transf = leit + escrita;
-        printf("\nLeitu | Escr | Transf\n");
-        printf("%ld \t%ld \t%ld\n", leit, escrita, transf);
-        printf("\nTEMPO\nCriação da árvore binária: %lf\nBusca do registro: %lf\n\n", tempo_criacao, tempo_busca);
         
 
         //árvore binária
@@ -210,22 +216,65 @@ FILE* abreArquivo(int situacao, int quantidade){
         return NULL;
     }
 
+    situacaoStr = retornaSituacao(situacao);
+
+    quantidadeStr = retornaQuantidade(quantidade);
+
+    sprintf(filename, "registros/registros%s%s.bin", quantidadeStr, situacaoStr);
+    if((arq = fopen(filename, "rb")) == NULL){
+        return NULL; 
+    }
+
+    return arq;   
+}
+
+bool arquivoContagens(int fase, int qtd, int sit, char metodo[], TipoContador cont){
+    FILE* arq;
+    char filename[50];
+    char *qtdStr;
+    char *sitStr;
+
+    qtdStr = retornaQuantidade(qtd);
+    sitStr = retornaSituacao(sit);
+    
+    sprintf(filename, "contagens/%s/%s/%s_%s", metodo, qtdStr, sitStr, fase == 1 ? "C" : "B");
+
+    if(access(filename, F_OK) == 0){
+        arq = fopen(filename, "a");
+    }else{
+        arq = fopen(filename, "w");
+        if(arq == NULL) return false;
+        fprintf(arq, "Leituras | Escritas | Transf T | Comparações | Tempo_Total\n");
+    }
+    if(arq == NULL) return false;
+
+    fprintf(arq, "%ld\t\t\t%ld\t\t\t%ld\t\t\t%ld\t\t\t%lf\n", cont.leitura, cont.escrita, cont.leitura + cont.escrita, cont.compChave, cont.tempo);
+    fclose(arq);
+    return true;
+}
+
+char *retornaSituacao(int situacao){
+    char *sitStr;
     switch (situacao)
     {
     case 1:
-        situacaoStr = "";
+        sitStr = "";
         break;
     case 2:
-        situacaoStr = "D";
+        sitStr = "D";
         break;
     case 3:
-        situacaoStr = "O";
+        sitStr = "O";
         break;
     default:
         printf("Situação Inválida; Erro no tratamento de entradas\n");
         return NULL;
     }
+    return sitStr;
+}
 
+char *retornaQuantidade(int quantidade){
+    char *quantidadeStr;
     switch (quantidade)
     {
     case 100:
@@ -249,11 +298,10 @@ FILE* abreArquivo(int situacao, int quantidade){
         return NULL;
         break;
     }
+    return quantidadeStr;
+}
 
-    sprintf(filename, "registros/registros%s%s.bin", quantidadeStr, situacaoStr);
-    if((arq = fopen(filename, "rb")) == NULL){
-        return NULL; 
-    }
-
-    return arq;   
+void iniciaContador(TipoContador *cont){
+    (*cont).leitura = 0;
+    (*cont).escrita = 0;
 }

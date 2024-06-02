@@ -22,11 +22,6 @@ typedef struct TipoPagina{
     TipoApontador p[MM + 1];//esse vetor contem +1, pois serve para indicar que são os filhos. Onde cada posição do meu vetor guarda uma variável do TipoApontador. 
 }TipoPagina;
 
-typedef struct TipoContador{
-    long int transfe;
-    long int compChave;
-    long int compPag;
-}TipoContador;
 
 void inicializa ( TipoApontador* );
 bool pesquisaB ( TipoRegistro *,TipoApontador,int*,TipoContador*);
