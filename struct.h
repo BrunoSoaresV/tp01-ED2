@@ -1,7 +1,7 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
-#define ITENSPAGINA 4
+#define ITENSPAGINA 8
 // Definindo a estrutura do registro
 typedef struct {
     int chave;

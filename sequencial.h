@@ -8,7 +8,7 @@ typedef struct {
     int chave;
 } tipoindice;
 
-int pesquisa(tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao);
-void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq);
+int pesquisa(tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao, TipoContador *busca);
+void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq, TipoContador *construcao);
 
 #endif

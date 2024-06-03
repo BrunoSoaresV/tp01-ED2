@@ -13,6 +13,7 @@ tNo criaNovoNo(Registro dados){
     return novoNo;
 }
 
+
 int calcularQuantidadeRegistros(FILE *arquivo) {
     fseek(arquivo, 0, SEEK_END);
     long tamanho = ftell(arquivo);
@@ -24,7 +25,7 @@ int calcularQuantidadeRegistros(FILE *arquivo) {
 //Os elementos do arquivo são percorridos e inseridos no novo arquivo
 // Inserir enquanto tiver registros e páginas
 // a última página tem o total de registros menos o quanto já foram inseridos (qtd de páginas * qtd por página)
-bool geraArquivoBinaria(FILE* origem, int quantidade, long int *leit, long int *escrita){
+bool geraArquivoBinaria(FILE* origem, int quantidade, TipoContador *cont){
     Registro dados[ITENSPAGINA];
     FILE* arvore;
     FILE* txtFile;
@@ -60,13 +61,13 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, long int *leit, long int *
             printf("Quantidade de arquivos na página %d \n", qtdItensPag);
             printf("Erro fatal ao tentar ler dado no arquivo de origem\n");
             return false;
-        }else (*leit)++;
+        }else ((*cont).leitura)++;
 
         for(int i = 0; i < qtdItensPag; i++) {
-            insere(dados[i], qtdItens, arvore, leit, escrita);
+            insere(dados[i], qtdItens, arvore, cont);
 
             qtdItens++;
-            //printf("Quantidade de itens na árvore: %d\n", qtdItens);
+            printf("Quantidade de itens na árvore: %d\n", qtdItens);
             //Colocar um return booleano na insere, ou fazer a verificação de erro nela mesma?
         }
         paginaAtual++;
@@ -77,7 +78,7 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, long int *leit, long int *
     return true; //Arquivo árvore gerado com sucesso
 }
 
-bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int *escrita){
+bool insere(Registro dado, int qtdItens, FILE* arvore, TipoContador *cont){
     // o dado recebido é atribuído a um nó
     tNo novoNo, noAtual;
     novoNo = criaNovoNo(dado);
@@ -86,7 +87,7 @@ bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int 
     // caso a árvore ainda não tenha itens, este será o primeiro item dela
     if(qtdItens == 0){
         if(fwrite(&novoNo, sizeof(tNo), 1, arvore) != 1) return false;
-        (*escrita)++;
+        (*cont).escrita++;
         return true;
     }
 
@@ -110,9 +111,10 @@ bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int 
                 perror("Error reading from file");
             }
             return false;
-        }else (*leit)++;
+        }else (*cont).leitura++;
 
-        // compara se o novo é maior. 
+        // compara se o novo é maior.
+        (*cont).compChave++; // é feita apenas uma comparação entre chaves a cada iteração
         if(novoNo.dados.chave > noAtual.dados.chave){
             //Se sim, verifica se o atual tem um filho à direita. Se não tiver, insere
             if(noAtual.dir == -1){
@@ -125,14 +127,15 @@ bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int 
                     printf("Falha em sobrescrever dado no arquivo\n");
                     return false;
                 }
-                (*escrita)++;
+                (*cont).escrita++;
+
                 // grava o novo nó no fim do arquivo
                 fseek(arvore, 0, SEEK_END);
                 if((fwrite(&novoNo, sizeof(tNo), 1, arvore)) != 1){
                     printf("Falha em adicionar dado no arquivo\n");
                     return false;
                 }
-                (*escrita)++;
+                (*cont).escrita++;
                 dadoInserido = true;
 
             }else{ //Se tiver filho, se move para ele e continua a verificação
@@ -151,14 +154,14 @@ bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int 
                     printf("Falha em sobrescrever dado no arquivo\n");
                     return false;
                 }
-                (*escrita)++;
+                (*cont).escrita++;
                 // grava o novo nó no fim do arquivo
                 fseek(arvore, 0, SEEK_END);
                 if((fwrite(&novoNo, sizeof(tNo), 1, arvore)) != 1){
                     printf("Falha em adicionar dado no arquivo\n");
                     return false;
                 }
-                (*escrita)++;
+                (*cont).escrita++;
                 dadoInserido = true;
 
             }else{ //Se tiver filho, se move para ele e continua a verificação
@@ -176,8 +179,9 @@ bool insere(Registro dado, int qtdItens, FILE* arvore, long int *leit, long int 
 }
 
 
-int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, long int *leit){
-
+int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, long int *leit, int depth){
+    printf("Depth: %d\n", depth);
+    depth++;
     // move o ponteiro do arquivo para o nó que será lido
     fseek(arvore, posAtual * sizeof(tNo), SEEK_SET);
 
@@ -198,7 +202,7 @@ int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, 
             printf("O elemento de chave %d não está presente no arquivo\n", chave);
             return -1;
         }else{
-            return buscaBinaria(arvore, no.dir, no, chave, dado, leit);
+            return buscaBinaria(arvore, no.dir, no, chave, dado, leit, depth);
         }
 
     // se a chave buscada for menor, continua buscando à esquerda
@@ -207,8 +211,37 @@ int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, 
             printf("O elemento de chave %d não está presente no arquivo\n", chave);
             return -1;
         }
-        return buscaBinaria(arvore, no.esq, no, chave, dado, leit); 
+        return buscaBinaria(arvore, no.esq, no, chave, dado, leit, depth); 
     }
+}
+
+int buscaBinariaI(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, TipoContador *cont){
+    
+    while(posAtual != -1){
+        fseek(arvore, posAtual * sizeof(tNo), SEEK_SET);
+
+        if(fread(&no, sizeof(tNo), 1, arvore) == 0){
+            printf("Erro na leitura do arquivo da árvore\n");
+            return -1;
+        }else (*cont).leitura++;
+
+        if(no.dados.chave == chave){
+            *dado = no.dados;
+            return posAtual;
+        }
+        
+        if(no.dados.chave < chave){
+            
+            posAtual = no.dir;
+        }else{
+            posAtual = no.esq;
+        }
+
+        (*cont).compChave += 2; // são feitas duas comparações entre chaves a cada iteração
+    }
+
+    printf("Elemento de chave %d não está presente no arquivo.\n", chave);
+    return -1;
 }
 
 // Imprime a árvore binária em um arquivo, no formato texto

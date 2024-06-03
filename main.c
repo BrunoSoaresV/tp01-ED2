@@ -8,6 +8,7 @@
 #include "arvoreB.h"
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 
 /*  SOBRE OS ARQUIVOS 
     Todos os arquivos com os dados de teste foram gerados previamente e preenchidos de maneira aleatória (três arquivos por quantidade)
@@ -26,10 +27,11 @@
 bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int chave);
 bool ChaveInvalida(const char* chave);
 FILE* abreArquivo(int, int);
-bool arquivoContagens(int fase, int qtd, int sit, char metodo[], TipoContador cont);
+bool arquivoContagens(int chave, int fase, int qtd, int sit, char metodo[], TipoContador cont);
 void iniciaContador(TipoContador *cont);
 char *retornaSituacao(int situacao);
 char *retornaQuantidade(int quantidade);
+void imprimeElemento(int pos, Registro dado);
 
 int main(int argc, char *argv[]){
 
@@ -38,6 +40,7 @@ int main(int argc, char *argv[]){
     int quantidade = atoi(argv[2]);
     int situacao = atoi(argv[3]);
     int chave = atoi(argv[4]);
+    int flagP = (argc == 6) ? atoi(argv[5]) : 0;
 
     // variáveis para controle de transferências e de tempo
     TipoContador construcao, busca;
@@ -75,18 +78,25 @@ int main(int argc, char *argv[]){
         
         // gera tabela de índices
         start = clock();
-        geraTabela(tabela, &pos, x, arq);
+        geraTabela(tabela, &pos, x, arq, &construcao);
         end = clock();
         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        arquivoContagens(chave, 1, quantidade, situacao, "sequencial", construcao);
 
         // ativa a função de pesquisa
         start = clock();
-        if (pesquisa (tabela, pos, &x, arq, situacao))
-            printf ("Registro (codigo %d) foi localizado",x.chave);
-        else
-            printf ("Registro de código %d nao foi localizado",x.chave);
+        if (pesquisa (tabela, pos, &x, arq, situacao, &busca)){
+            printf ("Registro (codigo %d) foi localizado\n",x.chave);
+            // imprime elementos no terminal
+            if(flagP){
+                imprimeElemento(pos, dado);
+            }
+        }else{
+            printf ("Registro de código %d nao foi localizado\n",x.chave);
+        }
         end = clock();
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        arquivoContagens(chave, 2, quantidade, situacao, "sequencial", busca);
 
 
         fclose (arq);
@@ -99,10 +109,10 @@ int main(int argc, char *argv[]){
 
         // gera a árvore binária
         start = clock();
-        geraArquivoBinaria(arq, quantidade, &construcao.leitura, &construcao.escrita);
+        geraArquivoBinaria(arq, quantidade, &construcao);
         end = clock();
         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
-        if((arquivoContagens(1, quantidade, situacao, "arvBin\0", construcao)) == false){
+        if((arquivoContagens(chave, 1, quantidade, situacao, "arvBin\0", construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construção : Árvore Binária)");
         }
 
@@ -111,26 +121,24 @@ int main(int argc, char *argv[]){
             return 0;
         }
         
+        printf("Iniciando ImprimeÁrvore\n");
         imprimeArvore(arvore, quantidade);
+        printf("ImprimeArvore concluído\n");
 
         // busca o arquivo na árvore
         start = clock();
-        posNaArvore = buscaBinaria(arvore, 0, no, chave, &dado, &busca.leitura);
+        posNaArvore = buscaBinariaI(arvore, 0, no, chave, &dado, &busca);
         end = clock();
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
-        if((arquivoContagens(2, quantidade, situacao, "arvBin\0",  busca)) == false){
+        if((arquivoContagens(chave, 2, quantidade, situacao, "arvBin\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore Binária)");
         }
 
-        if(posNaArvore != -1){
-            printf("\nO elemento procurado está na posição %d\n", posNaArvore+1);
-            printf("O elemento buscado é:\n");
-            printf("Chave: %d\n", dado.chave);
-            printf("Dado1: %ld\n", dado.dado1);
-            printf("Dado2: %.10s...\n", dado.dado2);
-            printf("Dado3: %.10s...\n", dado.dado3);
+        if(posNaArvore != -1 && flagP){
+            imprimeElemento(posNaArvore+1, dado);
         }
 
+        fclose(arvore);
         
 
         //árvore binária
@@ -228,7 +236,7 @@ FILE* abreArquivo(int situacao, int quantidade){
     return arq;   
 }
 
-bool arquivoContagens(int fase, int qtd, int sit, char metodo[], TipoContador cont){
+bool arquivoContagens(int chave, int fase, int qtd, int sit, char metodo[], TipoContador cont){
     FILE* arq;
     char filename[50];
     char *qtdStr;
@@ -236,19 +244,20 @@ bool arquivoContagens(int fase, int qtd, int sit, char metodo[], TipoContador co
 
     qtdStr = retornaQuantidade(qtd);
     sitStr = retornaSituacao(sit);
+    if(!(strcmp(sitStr, ""))) sitStr = "Crescente";
     
-    sprintf(filename, "contagens/%s/%s/%s_%s", metodo, qtdStr, sitStr, fase == 1 ? "C" : "B");
+    sprintf(filename, "contagens/%s/%s/%s_%s", metodo, qtdStr, sitStr, fase == 1 ? "Construcao" : "Busca");
 
     if(access(filename, F_OK) == 0){
         arq = fopen(filename, "a");
     }else{
         arq = fopen(filename, "w");
         if(arq == NULL) return false;
-        fprintf(arq, "Leituras | Escritas | Transf T | Comparações | Tempo_Total\n");
+        fprintf(arq, "%-10s | %-10s | %-10s | %-15s | %-12s | %-12s\n", "Chave", "Leituras", "Escritas", "Transf T", "Comparações", "Tempo_Total");
     }
     if(arq == NULL) return false;
 
-    fprintf(arq, "%ld\t\t\t%ld\t\t\t%ld\t\t\t%ld\t\t\t%lf\n", cont.leitura, cont.escrita, cont.leitura + cont.escrita, cont.compChave, cont.tempo);
+    fprintf(arq, "%-10d | %-10ld | %-10ld | %-15ld | %-12ld | %-12lf\n", chave, cont.leitura, cont.escrita, cont.leitura + cont.escrita, cont.compChave, cont.tempo);
     fclose(arq);
     return true;
 }
@@ -304,4 +313,14 @@ char *retornaQuantidade(int quantidade){
 void iniciaContador(TipoContador *cont){
     (*cont).leitura = 0;
     (*cont).escrita = 0;
+    (*cont).compChave = 0;
+}
+
+void imprimeElemento(int pos, Registro dado){
+    printf("\nO elemento procurado está na posição %d\n", pos);
+    printf("O elemento buscado é:\n");
+    printf("Chave: %d\n", dado.chave);
+    printf("Dado1: %ld\n", dado.dado1);
+    printf("Dado2: %.10s...\n", dado.dado2);
+    printf("Dado3: %.10s...\n", dado.dado3);
 }

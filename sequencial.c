@@ -3,7 +3,7 @@
 #include "sequencial.h"
 #include "struct.h"
 
-int pesquisa (tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao) {
+int pesquisa (tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao, TipoContador *cont) {
     Registro pagina[ITENSPAGINA];
     int i, quantitens;
     long desloc;
@@ -29,6 +29,7 @@ int pesquisa (tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao
 
         fseek (arq, desloc, SEEK_SET);
         fread (&pagina, sizeof(Registro), quantitens, arq);
+        (*cont).leitura++;
         
         /*// pesquisa sequencial na página lida
         for (i=0; i < quantitens; i++){
@@ -42,6 +43,7 @@ int pesquisa (tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao
         int fim = quantitens - 1;
         while (inicio <= fim) {
             int meio = (inicio + fim) / 2;
+            (*cont).compChave++;
             if (pagina[meio].chave == item->chave) {
                 *item = pagina[meio];
                 return 1;
@@ -57,10 +59,10 @@ int pesquisa (tipoindice tab[], int tam, Registro* item, FILE *arq, int situacao
     return 0;  
 }
 
-void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq) {
+void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq, TipoContador *cont) {
 
     while (fread(&x, sizeof(x), 1, arq) == 1) {
-        
+        (*cont).leitura++;
         tabela[*pos].chave = x.chave;
         (*pos)++;
         fseek(arq, (ITENSPAGINA-1)* sizeof(x), 1);

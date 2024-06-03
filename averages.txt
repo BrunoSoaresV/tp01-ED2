@@ -1,0 +1,14 @@
+Médias para /home/thiago/Documents/ED2/tp01-ED2/contagens/arvBin/Mil/O_Busca:
+Leituras: 11.40
+Escritas: 0.00
+Transf T: 11.40
+Comparações: 20.90
+Tempo_Total: 0.000021
+
+Médias para /home/thiago/Documents/ED2/tp01-ED2/contagens/arvBin/Mil/O_Construcao:
+Leituras: 12120.00
+Escritas: 1999.00
+Transf T: 14119.00
+Comparações: 11870.00
+Tempo_Total: 0.035704
+

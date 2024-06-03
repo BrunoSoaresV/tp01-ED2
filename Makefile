@@ -1,5 +1,5 @@
 all: main.o sequencial.o binaria.o
-	@gcc main.o sequencial.o binaria.o -o pesquisa
+	@gcc main.o sequencial.o binaria.o -o pesquisa -g
 main.o: main.c
 	@gcc main.c -c -Wall
 sequencial.o: sequencial.c
