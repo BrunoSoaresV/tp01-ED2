@@ -89,7 +89,7 @@ int main(int argc, char *argv[]){
             printf ("Registro (codigo %d) foi localizado\n",x.chave);
             // imprime elementos no terminal
             if(flagP){
-                imprimeElemento(pos, dado);
+                imprimeElemento(0, x); // não há nada guardando a posição dele aq
             }
         }else{
             printf ("Registro de código %d nao foi localizado\n",x.chave);
