@@ -13,7 +13,7 @@ typedef struct {
 
 int main() {
     // Abrindo o arquivo binário para escrita
-    FILE *arquivoBinario = fopen("registrosCemMil.bin", "wb");
+    FILE *arquivoBinario = fopen("registrosUmMilhao.bin", "wb");
 
     if (arquivoBinario == NULL) {
         printf("Erro ao abrir os arquivos.\n");
@@ -24,7 +24,7 @@ int main() {
     srand(time(NULL));
 
     // Gerando 100 registros aleatórios
-    for (int i = 1; i <= 100000; i++) {
+    for (int i = 1; i <= 1000000; i++) {
         Registro registro;
 
         // Definindo valores aleatórios para o registro
@@ -55,8 +55,8 @@ int main() {
     return 0;
 }
 
-
-/*void shuffle(int *array, int n) {
+/*
+void shuffle(long int *array, int n) {
     if (n > 1) {
         for (int i = 0; i < n - 1; i++) {
             int j = i + rand() / (RAND_MAX / (n - i) + 1);
@@ -86,17 +86,17 @@ int main() {
         return 1;
     }
 
-    // Gerando um array com chaves de 1 a 100
-    int chaves[100000];
-    for (int i = 0; i < 100000; i++) {
+    // Gerando um array com chaves de 1 a 1000000
+    long int chaves[1000000];
+    for (int i = 0; i < 1000000; i++) {
         chaves[i] = i + 1;
     }
 
     // Embaralhando as chaves
-    shuffle(chaves, 100000);
+    shuffle(chaves, 1000000);
 
     // Gerando 100 registros aleatórios com chaves únicas
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 1000000; i++) {
         Registro registro;
 
         // Definindo valores para o registro
@@ -124,9 +124,10 @@ int main() {
 
     // Fechando os arquivos
     fclose(arquivoBin);
-    //fclose(arquivoTxt);
+    fclose(arquivoTxt);
 
     printf("Arquivos binário e texto gerados com sucesso.\n");
 
     return 0;
-}*/
+}
+*/

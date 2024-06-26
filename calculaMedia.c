@@ -75,7 +75,7 @@ int main() {
         printf("Erro ao abrir o arquivo de saída.\n");
         return 1;
     }
-    const char* filePath = "/home/thiago/Documents/ED2/tp01-ED2/contagens/arvBin/Mil/O_Construcao";
+    const char* filePath = "/home/tliuth/Documents/ED2/tp01-ED2/contagens/arvBin/UmMilhao/O_Busca";
     calculaMedia(filePath, outputFile);
     return 0;
 }
