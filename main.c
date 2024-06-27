@@ -181,23 +181,41 @@ int main(int argc, char *argv[]){
             return 1;
         }
     
-        printf("Arq da árvore aberto\n");
-        iniciarTreeB(arq, arvoreB, 100,&posRaiz);
+        // Constroi a árvore B
+        start = clock();
+        iniciarTreeB(arq, arvoreB, quantidade,&posRaiz, &construcao);
+        end = clock();
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
         fclose(arvoreB);
         fclose(arq);
-        printf("Árvore iniciada\n");
 
-        printf("posRaiz: %ld\n",posRaiz);
+
+     // printf("Árvore iniciada\n");
+        printf("\nQuantidade: %d\n", quantidade);
+        //printf("posRaiz: %ld\n",posRaiz);
         // Abra novamente o arquivo da árvore B para leitura
         arvoreB = fopen("arvoreB.bin", "rb");
+
+        start = clock();
         if (arvoreB == NULL) {
             printf("Erro ao abrir arquivo da árvore B para leitura\n");
             return 1;
         }
-        if (pesquisaB(&regPesquisa, posRaiz, arvoreB)) {
+        if (pesquisaB(&regPesquisa, posRaiz, arvoreB, &busca)) {
             printf("\n\nRegistro com chave %d\n encontrado: dado1 = %ld\n dado2 = %s\n dado3 = %s\n\n",regPesquisa.dados.chave, regPesquisa.dados.dado1, regPesquisa.dados.dado2, regPesquisa.dados.dado3);
         } else {
             printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
+        }
+        end = clock();
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        fclose(arvoreB);
+
+        if((arquivoContagens(chave, 1, quantidade, situacao, "arvB\0",  construcao)) == false){
+            printf("Erro ao gerar arquivo de contagens (Construcao : Árvore B)");
+        }
+
+        if((arquivoContagens(chave, 2, quantidade, situacao, "arvB\0",  busca)) == false){
+            printf("Erro ao gerar arquivo de contagens (Busca : Árvore B)");
         }
 
         break;

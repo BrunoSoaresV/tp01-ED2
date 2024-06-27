@@ -10,19 +10,21 @@ void inicializa(TipoPagina *raiz) {
 }
 
 // Função para escrever uma página no arquivo em uma posição específica
-void escrevePagina(FILE *arquivoB, TipoPagina* pagina, long pos) {
+void escrevePagina(FILE *arquivoB, TipoPagina* pagina, long pos, TipoContador *cont) {
     fseek(arquivoB, pos * sizeof(TipoPagina), SEEK_SET); // Move o ponteiro do arquivo para a posição especificada
     fwrite(pagina, sizeof(TipoPagina), 1, arquivoB); // Escreve a página no arquivo
+    ((*cont).escrita)++;
 }
 
 // Função para ler uma página do arquivo em uma posição específica
-void lerPagina(FILE *arquivoB, TipoPagina* pagina, long pos) {
+void lerPagina(FILE *arquivoB, TipoPagina* pagina, long pos, TipoContador *cont) {
     fseek(arquivoB, pos * sizeof(TipoPagina), SEEK_SET); // Move o ponteiro do arquivo para a posição especificada
     fread(pagina, sizeof(TipoPagina), 1, arquivoB); // Lê a página do arquivo
+    ((*cont).leitura)++;
 }
 
 // Função para inicializar a árvore B a partir de um arquivo de origem(arq) e escrever no arquivo da árvore B
-void iniciarTreeB(FILE* arq, FILE* arvoreB, int quantidade, long *posRaiz) {
+void iniciarTreeB(FILE* arq, FILE* arvoreB, int quantidade, long *posRaiz, TipoContador *cont) {
     TipoRegistro reg;
     Registro dado;
 
@@ -33,21 +35,23 @@ void iniciarTreeB(FILE* arq, FILE* arvoreB, int quantidade, long *posRaiz) {
         if ((fread(&dado, sizeof(Registro), 1, arq)) != 1) {
             printf("Erro ao ler dado do arquivo de origem (Árvore B)\n");
             return;
-        }
+        }else{((*cont).leitura)++;}
+
         reg.dados = dado;
-        insereB(reg, posRaiz, arvoreB); // Insere o registro na árvore B
-        imprime(arvoreB, quantidade);
+        insereB(reg, posRaiz, arvoreB, cont); // Insere o registro na árvore B
+        //imprime(arvoreB, quantidade);
+      
     }
 }
 
 // Função para inserir um registro na árvore B
-void insereB(TipoRegistro reg, long *pos, FILE* arvoreB) {
+void insereB(TipoRegistro reg, long *pos, FILE* arvoreB, TipoContador *cont) {
     short cresceu = 0; // Flag para indicar se a árvore cresceu
     TipoRegistro regRetorno;
     long posRetorno = -1;
     TipoPagina novaPag;
 
-    ins(reg, *pos, &cresceu, &regRetorno, &posRetorno, arvoreB); // Insere o registro e verifica se houve crescimento
+    ins(reg, *pos, &cresceu, &regRetorno, &posRetorno, arvoreB, cont); // Insere o registro e verifica se houve crescimento
     if (cresceu) {
         novaPag.n = 1; // Inicializa a nova página
         novaPag.r[0] = regRetorno; // Define o registro de retorno na nova página
@@ -60,12 +64,12 @@ void insereB(TipoRegistro reg, long *pos, FILE* arvoreB) {
 
         fseek(arvoreB, 0, SEEK_END); // Move o ponteiro do arquivo para o final
         *pos = ftell(arvoreB) / sizeof(TipoPagina); // Calcula a nova posição
-        escrevePagina(arvoreB, &novaPag, *pos); // Escreve a nova página no arquivo
+        escrevePagina(arvoreB, &novaPag, *pos, cont); // Escreve a nova página no arquivo
     }
 }
 
 // Função recursiva para inserir um registro na árvore B
-void ins(TipoRegistro reg, long pos, short *cresceu, TipoRegistro *regRetorno, long *posRetorno, FILE *arvoreB) {
+void ins(TipoRegistro reg, long pos, short *cresceu, TipoRegistro *regRetorno, long *posRetorno, FILE *arvoreB, TipoContador *cont) {
     long i = 1;
     long j;
     TipoPagina pagina, pagTemp;
@@ -78,10 +82,10 @@ void ins(TipoRegistro reg, long pos, short *cresceu, TipoRegistro *regRetorno, l
         return;
     }
 
-    lerPagina(arvoreB, &pagina, pos); // Lê a página da posição fornecida
+    lerPagina(arvoreB, &pagina, pos, cont); // Lê a página da posição fornecida
 
     // Procura a posição correta para inserção
-    while (i < pagina.n && reg.dados.chave > pagina.r[i - 1].dados.chave) { i++; }
+    while (i < pagina.n && reg.dados.chave > pagina.r[i - 1].dados.chave) { i++; ((*cont).compChave)++;}
 
     // Se a chave já existe, não cresce
     if (reg.dados.chave == pagina.r[i - 1].dados.chave) {
@@ -92,17 +96,17 @@ void ins(TipoRegistro reg, long pos, short *cresceu, TipoRegistro *regRetorno, l
     if (reg.dados.chave < pagina.r[i - 1].dados.chave) { i--; }
 
     // Inserção recursiva na página filha adequada
-    ins(reg, pagina.p[i], cresceu, regRetorno, posRetorno, arvoreB);
+    ins(reg, pagina.p[i], cresceu, regRetorno, posRetorno, arvoreB,cont);
 
     // Se não cresceu, retorne
     if (!*cresceu) { return; }
 
-    lerPagina(arvoreB, &pagina, pos); // Releia a página após possível modificação
+    lerPagina(arvoreB, &pagina, pos, cont); // Releia a página após possível modificação
 
     // Se há espaço na página, insira diretamente
     if (pagina.n < MM) {
-        insereNaPagina(&pagina, *regRetorno, *posRetorno); // Insere o registro na página
-        escrevePagina(arvoreB, &pagina, pos); // Escreve a página atualizada no arquivo
+        insereNaPagina(&pagina, *regRetorno, *posRetorno, cont); // Insere o registro na página
+        escrevePagina(arvoreB, &pagina, pos, cont); // Escreve a página atualizada no arquivo
         *cresceu = false;
         return;
     }
@@ -115,36 +119,36 @@ void ins(TipoRegistro reg, long pos, short *cresceu, TipoRegistro *regRetorno, l
     // Verifica se o registro deve ser inserido na página temporária ou na original, dependendo da posição. Ou seja, se o meu i for maior do que a metade da pagina, quer dizer que o meu item é um valor alto, dessa forma, ele tem que ser inserindo diretamente na pagina temporaria, caso ao contrario o item vai ser inserido na pagina original
     if (i < M + 1) {
         // Se o índice de inserção está na primeira metade da página original
-        insereNaPagina(&pagTemp, pagina.r[MM - 1], pagina.p[MM]); // Move o último registro da página original para a temporária
+        insereNaPagina(&pagTemp, pagina.r[MM - 1], pagina.p[MM], cont); // Move o último registro da página original para a temporária
         pagina.n--; // Decrementa o número de registros na página original
-        insereNaPagina(&pagina, *regRetorno, *posRetorno); // Insere o novo registro na página original
+        insereNaPagina(&pagina, *regRetorno, *posRetorno, cont); // Insere o novo registro na página original
     } else {
         // Se o índice de inserção está na segunda metade da página original
-        insereNaPagina(&pagTemp, *regRetorno, *posRetorno); // Insere o novo registro diretamente na página temporária
+        insereNaPagina(&pagTemp, *regRetorno, *posRetorno, cont); // Insere o novo registro diretamente na página temporária
     }
 
     // Transfere metade dos registros da página original para a temporária
     for (j = M + 2; j <= MM; j++) {
-        insereNaPagina(&pagTemp, pagina.r[j - 1], pagina.p[j]); // Move os registros da segunda metade para a temporária
+        insereNaPagina(&pagTemp, pagina.r[j - 1], pagina.p[j], cont); // Move os registros da segunda metade para a temporária
     }
 
     pagina.n = M; // Ajusta o número de registros na página original para a metade
-    pagTemp.p[0] = pagina.p[M + 1]; // Define o primeiro filho da página temporária como o filho após a metade da original
-    escrevePagina(arvoreB, &pagina, pos); // Escreve a página original de volta ao arquivo
-    escrevePagina(arvoreB, &pagTemp, final); // Escreve a nova página no arquivo
+    pagTemp.p[0] = pagina.p[M + 1]; // Define o primeiro filho da pagina temporaria como o filho apos a metade da original
+    escrevePagina(arvoreB, &pagina, pos, cont); // Escreve a pagina original de volta ao arquivo
+    escrevePagina(arvoreB, &pagTemp, final, cont); // Escreve a nova pagina no arquivo
 
     *regRetorno = pagina.r[M]; // Define o registro de retorno como o registro do meio
-    *posRetorno = final; // Define a posição de retorno como a posição da nova página
+    *posRetorno = final; // Define a posicao de retorno como a posicao da nova pagina
 }
 
-// Função para inserir um registro em uma página específica
-void insereNaPagina(TipoPagina *pagina, TipoRegistro reg, long apoDir) {
+// Funcao para inserir um registro em uma pagina especifica
+void insereNaPagina(TipoPagina *pagina, TipoRegistro reg, long apoDir, TipoContador *cont) {
     short naoAchouPosicao;
     int k;
     k = pagina->n;
     naoAchouPosicao = (k > 0);
 
-    // Desloca registros e filhos para abrir espaço para o novo registro
+    // Desloca registros e filhos para abrir espaco para o novo registro
     while (naoAchouPosicao) {
         if (reg.dados.chave >= pagina->r[k - 1].dados.chave) {
             naoAchouPosicao = 0;
@@ -161,41 +165,47 @@ void insereNaPagina(TipoPagina *pagina, TipoRegistro reg, long apoDir) {
     // Insere o novo registro e ajusta os filhos
     pagina->r[k] = reg;
     pagina->p[k + 1] = apoDir;
-    pagina->n++; // Incrementa o número de registros na página
+    pagina->n++; // Incrementa o numero de registros na pagina
 }
 
-// Função para procurar um registro em especifico
-// Função para procurar um registro em especifico
-bool pesquisaB(TipoRegistro *reg, long pos, FILE *arvoreB) {
+bool pesquisaB(TipoRegistro *reg, long pos, FILE *arvoreB, TipoContador *cont) {
     TipoPagina pagina;
-    long i=1;
+   // printf("\nPesquisando chave: %d\n", reg->dados.chave);
+   // printf("Posicao atual: %ld\n", pos);
+    long i = 1 ;
 
-    if (pos == -1) { // Verifica se a posição é inválida
+    if (pos == -1) { // Verifica se a posicao e invalida
         return false;
     }
 
-    lerPagina(arvoreB, &pagina, pos); // Lê a página da posição fornecida
-
-    // Inicializa i para procurar a posição correta
+    lerPagina(arvoreB, &pagina, pos, cont); // Le a pagina da posicao fornecida
+    /*printf("Pagina lida: n = %d\n", pagina.n);
+    for (int j = 0; j < pagina.n; j++) {
+        printf("Chave %d na pagina [%ld] : %d\n", j+1,pos, pagina.r[j].dados.chave);
+    }*/
+    // Inicializa i para procurar a posicao correta
   
-    while (i < pagina.n && reg->dados.chave > pagina.r[i].dados.chave) {
+    while (i < pagina.n && reg->dados.chave > pagina.r[i - 1].dados.chave) {
         i++;
     }
 
-    // Verifica se encontrou a chave
-    if (i < pagina.n && reg->dados.chave == pagina.r[i].dados.chave) {
-        *reg = pagina.r[i];
+    // Verifica se encontrou a chave4
+    if (reg->dados.chave == pagina.r[i-1].dados.chave) {
+       // printf("Chave encontrada: %d\n", reg->dados.chave);
+        *reg = pagina.r[i-1];
         return true;
     }
 
-    // Decide qual subárvore explorar em seguida
-    if (i < pagina.n && reg->dados.chave < pagina.r[i].dados.chave) {
-        return pesquisaB(reg, pagina.p[i],arvoreB);
+    // Decide qual subarvore explorar em seguida
+    if (reg->dados.chave < pagina.r[i-1].dados.chave) {
+        //printf("Descendo para a subarvore esquerda\n");
+        return pesquisaB(reg, pagina.p[i-1],arvoreB,cont);
     } else {
-        return pesquisaB(reg, pagina.p[i + 1],arvoreB);
+        //printf("Descendo para a subarvore direita\n");
+        return pesquisaB(reg, pagina.p[i],arvoreB,cont);
     }
 }
-
+/*
 void imprime(FILE*arvoreb, int quantidade){
     fseek(arvoreb, 0, SEEK_END);
     int q = ftell(arvoreb) / sizeof(TipoPagina);
@@ -221,3 +231,4 @@ void imprime(FILE*arvoreb, int quantidade){
     }
     printf("\n---------------------------\n\n");
 }
+*/

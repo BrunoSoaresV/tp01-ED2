@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "struct.h"
-#define M 2 //Minimo
+#define M 50 //Minimo
 #define MM (M*2) //Maximo
 
 //typedef long TipoChave;
@@ -25,14 +25,14 @@ typedef struct TipoPagina{
    - arquivoB: O arquivo onde a página será escrita.
    - pagina: A página a ser escrita no arquivo.
    - pos: A posição onde a página será escrita no arquivo. */
-void escrevePagina(FILE *arquivoB,TipoPagina* pagina,long pos);
+void escrevePagina(FILE *arquivoB,TipoPagina* pagina,long pos, TipoContador *cont);
 
 /* Função responsável por ler a página do arquivo.
    Parâmetros:
    - arquivoB: O arquivo de onde a página será lida.
    - pagina: A página a ser lida do arquivo.
    - pos: A posição de onde a página será lida no arquivo. */
-void lerPagina(FILE *arquivoB,TipoPagina* pagina,long pos);
+void lerPagina(FILE *arquivoB,TipoPagina* pagina,long pos, TipoContador *cont);
 
 /* Função responsável por inicializar as páginas do arquivo.
    Inicializa a quantidade de itens de cada página como 0, os filhos como NULL (-1) e as chaves com -1 para evitar lixo. 
@@ -45,7 +45,7 @@ void inicializa ( TipoPagina *raiz);
    - arq: O arquivo de origem.
    - arvoreB: O arquivo onde será implementada a árvore B.
    - quantidade: A quantidade de itens que serão inseridos no arquivo. */
-void iniciarTreeB(FILE* arq, FILE*arvoreB, int quantidade,long *posRaiz);
+void iniciarTreeB(FILE* arq, FILE*arvoreB, int quantidade,long *posRaiz, TipoContador *cont);
 
 /* Função responsável por controlar a inserção nas páginas e na raiz.
    Verifica se a árvore precisará de uma nova raiz ou não (depende do que a função ins retornar).
@@ -53,7 +53,7 @@ void iniciarTreeB(FILE* arq, FILE*arvoreB, int quantidade,long *posRaiz);
    - reg: O registro que será inserido.
    - pos: A posição onde o registro será inserido.
    - arvoreB: O arquivo da árvore B. */
-void insereB( TipoRegistro reg,long *pos, FILE* arvoreB);
+void insereB( TipoRegistro reg,long *pos, FILE* arvoreB, TipoContador *cont);
 
 /* Função responsável por verificar se a raiz está vazia ou não.
    Se estiver vazia, a função retorna para insereB e implementa a raiz. Caso contrário, verifica se a página tem espaço para receber mais um item. Se tiver espaço, insere na página; caso contrário, faz o overflow.
@@ -64,14 +64,14 @@ void insereB( TipoRegistro reg,long *pos, FILE* arvoreB);
    - regRetorno: Registro de retorno após a inserção.
    - posRetorno: Posição de retorno após a inserção.
    - arvoreB: O arquivo da árvore B. */
-void ins( TipoRegistro reg, long pos, short *cresceu,TipoRegistro *regRetorno,long *posRetorno, FILE *arvoreB);
+void ins( TipoRegistro reg, long pos, short *cresceu,TipoRegistro *regRetorno,long *posRetorno, FILE *arvoreB, TipoContador *cont);
 
 /* Função responsável por inserir um registro na página.
    Parâmetros:
    - pagina: A página onde o registro será inserido.
    - reg: O registro que será inserido.
    - apoDir: Apontador para a direita. */
-void insereNaPagina ( TipoPagina *pagina,TipoRegistro reg,long apoDir); 
+void insereNaPagina ( TipoPagina *pagina,TipoRegistro reg,long apoDir, TipoContador *cont); 
 
 /* Função responsável pela pesquisa no arquivo.
    Parâmetros:
@@ -79,7 +79,7 @@ void insereNaPagina ( TipoPagina *pagina,TipoRegistro reg,long apoDir);
    - pos: A posição onde a pesquisa será realizada.
    - arvoreB: O arquivo da árvore B.
    Retorna true se o registro for encontrado, caso contrário, false. */
-bool pesquisaB ( TipoRegistro *reg,long pos,FILE *arvoreB);
-void imprime(FILE*arvoreb, int quantidade);
+bool pesquisaB ( TipoRegistro *reg,long pos,FILE *arvoreB, TipoContador *cont);
+//void imprime(FILE*arvoreb, int quantidade);
 
 #endif//arvoreB_h
