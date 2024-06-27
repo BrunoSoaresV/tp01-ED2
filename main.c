@@ -57,6 +57,12 @@ int main(int argc, char *argv[]){
     int pos;
     Registro x;
     
+    //variaveis para uso do método 3 (arvore B)
+    FILE *arvoreB;
+    long posRaiz;
+    TipoRegistro regPesquisa;
+    regPesquisa.dados.chave = chave;
+
     // Verifica se as entradas são válidas
     if(EntradaInvalida(argc, metodo, quantidade, situacao, chave) || ChaveInvalida(argv[4])){
         return 0;
@@ -84,18 +90,40 @@ int main(int argc, char *argv[]){
         arquivoContagens(chave, 1, quantidade, situacao, "sequencial", construcao);
 
         // ativa a função de pesquisa
-        start = clock();
-        if (pesquisa (tabela, pos, &x, arq, situacao, &busca)){
-            printf ("Registro (codigo %d) foi localizado\n",x.chave);
-            // imprime elementos no terminal
-            if(flagP){
-                imprimeElemento(0, x); // não há nada guardando a posição dele aq
+
+        switch (situacao)
+        {
+        case 1:
+            start = clock();
+            if (pesquisaCrescente (tabela, pos, &x, arq, &busca)){
+                printf ("Registro (codigo %d) foi localizado\n",x.chave);
+                // imprime elementos no terminal
+                if(flagP){
+                    imprimeElemento(0, x); // não há nada guardando a posição dele aq
+                }
+            }else{
+                printf ("Registro de código %d nao foi localizado\n",x.chave);
             }
-        }else{
-            printf ("Registro de código %d nao foi localizado\n",x.chave);
+            end = clock();
+            busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+            break;
+        
+        case 2:
+            start = clock();
+            if (pesquisaDecrescente (tabela, pos, &x, arq, &busca)){
+                printf ("Registro (codigo %d) foi localizado\n",x.chave);
+                // imprime elementos no terminal
+                if(flagP){
+                    imprimeElemento(0, x); // não há nada guardando a posição dele aq
+                }
+            }else{
+                printf ("Registro de código %d nao foi localizado\n",x.chave);
+            }
+            end = clock();
+            busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+            break;
         }
-        end = clock();
-        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+
         arquivoContagens(chave, 2, quantidade, situacao, "sequencial", busca);
 
 
@@ -109,9 +137,10 @@ int main(int argc, char *argv[]){
 
         // gera a árvore binária
         start = clock();
-        geraArquivoBinaria(arq, quantidade, &construcao);
+        geraArquivoBinaria(arq, quantidade, &construcao); 
         end = clock();
         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+
         if((arquivoContagens(chave, 1, quantidade, situacao, "arvBin\0", construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construção : Árvore Binária)");
         }
@@ -139,12 +168,38 @@ int main(int argc, char *argv[]){
         }
 
         fclose(arvore);
+        fclose(arq);
         
 
         //árvore binária
         break;
     case 3:
-        // Chamar a iniciarTreeB
+        arvoreB = fopen("arvoreB.bin", "wb+");
+        if (arvoreB == NULL) {
+            printf("Erro ao abrir arquivo da árvore B\n");
+            fclose(arq); // Feche o arquivo de registros se falhar ao abrir o arquivo da árvore B
+            return 1;
+        }
+    
+        printf("Arq da árvore aberto\n");
+        iniciarTreeB(arq, arvoreB, 100,&posRaiz);
+        fclose(arvoreB);
+        fclose(arq);
+        printf("Árvore iniciada\n");
+
+        printf("posRaiz: %ld\n",posRaiz);
+        // Abra novamente o arquivo da árvore B para leitura
+        arvoreB = fopen("arvoreB.bin", "rb");
+        if (arvoreB == NULL) {
+            printf("Erro ao abrir arquivo da árvore B para leitura\n");
+            return 1;
+        }
+        if (pesquisaB(&regPesquisa, posRaiz, arvoreB)) {
+            printf("\n\nRegistro com chave %d\n encontrado: dado1 = %ld\n dado2 = %s\n dado3 = %s\n\n",regPesquisa.dados.chave, regPesquisa.dados.dado1, regPesquisa.dados.dado2, regPesquisa.dados.dado3);
+        } else {
+            printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
+        }
+
         break;
     case 4:
         //Árvore B estrela
