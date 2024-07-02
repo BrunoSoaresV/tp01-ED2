@@ -13,14 +13,14 @@ void inicializa(TipoPagina *raiz) {
 void escrevePagina(FILE *arquivoB, TipoPagina* pagina, long pos, TipoContador *cont) {
     fseek(arquivoB, pos * sizeof(TipoPagina), SEEK_SET); // Move o ponteiro do arquivo para a posição especificada
     fwrite(pagina, sizeof(TipoPagina), 1, arquivoB); // Escreve a página no arquivo
-    ((*cont).escrita)++;
+    (cont->escrita)++;
 }
 
 // Função para ler uma página do arquivo em uma posição específica
 void lerPagina(FILE *arquivoB, TipoPagina* pagina, long pos, TipoContador *cont) {
     fseek(arquivoB, pos * sizeof(TipoPagina), SEEK_SET); // Move o ponteiro do arquivo para a posição especificada
     fread(pagina, sizeof(TipoPagina), 1, arquivoB); // Lê a página do arquivo
-    ((*cont).leitura)++;
+    (cont->leitura)++;
 }
 
 // Função para inicializar a árvore B a partir de um arquivo de origem(arq) e escrever no arquivo da árvore B
@@ -35,10 +35,12 @@ void iniciarTreeB(FILE* arq, FILE* arvoreB, int quantidade, long *posRaiz, TipoC
         if ((fread(&dado, sizeof(Registro), 1, arq)) != 1) {
             printf("Erro ao ler dado do arquivo de origem (Árvore B)\n");
             return;
-        }else{((*cont).leitura)++;}
+        }else{(cont->leitura)++;}
 
         reg.dados = dado;
         insereB(reg, posRaiz, arvoreB, cont); // Insere o registro na árvore B
+        //printf("[iniciarTreeB] chave a ser inserida = %d\n", reg.dados.chave);
+       //printf("[iniciarTreeB] posRaiz = %ld\n", *posRaiz);
         //imprime(arvoreB, quantidade);
       
     }
@@ -85,16 +87,22 @@ void ins(TipoRegistro reg, long pos, short *cresceu, TipoRegistro *regRetorno, l
     lerPagina(arvoreB, &pagina, pos, cont); // Lê a página da posição fornecida
 
     // Procura a posição correta para inserção
-    while (i < pagina.n && reg.dados.chave > pagina.r[i - 1].dados.chave) { i++; ((*cont).compChave)++;}
+    while (i < pagina.n && reg.dados.chave > pagina.r[i - 1].dados.chave) { 
+        i++;
+        (cont->compChave)++;
+    }
 
     // Se a chave já existe, não cresce
+    (cont->compChave)++;
     if (reg.dados.chave == pagina.r[i - 1].dados.chave) {
         *cresceu = false;
         return;
     }
     // Verifica para qual página filho vai ser chamada ( direita ou esquerda). Se a chave que eu estou querendo inserir for maior do que a da pagina atual, eu não entro no if, com isso vou para o lado direito, se o item for menor eu decremento o i, com isso vou para a pagina esquerda 
-    if (reg.dados.chave < pagina.r[i - 1].dados.chave) { i--; }
-
+    (cont->compChave)++;
+    if (reg.dados.chave < pagina.r[i - 1].dados.chave) {
+        i--; 
+    }
     // Inserção recursiva na página filha adequada
     ins(reg, pagina.p[i], cresceu, regRetorno, posRetorno, arvoreB,cont);
 
@@ -150,6 +158,7 @@ void insereNaPagina(TipoPagina *pagina, TipoRegistro reg, long apoDir, TipoConta
 
     // Desloca registros e filhos para abrir espaco para o novo registro
     while (naoAchouPosicao) {
+        (cont->compChave)++;
         if (reg.dados.chave >= pagina->r[k - 1].dados.chave) {
             naoAchouPosicao = 0;
             break;
@@ -166,6 +175,7 @@ void insereNaPagina(TipoPagina *pagina, TipoRegistro reg, long apoDir, TipoConta
     pagina->r[k] = reg;
     pagina->p[k + 1] = apoDir;
     pagina->n++; // Incrementa o numero de registros na pagina
+
 }
 
 bool pesquisaB(TipoRegistro *reg, long pos, FILE *arvoreB, TipoContador *cont) {
@@ -187,9 +197,11 @@ bool pesquisaB(TipoRegistro *reg, long pos, FILE *arvoreB, TipoContador *cont) {
   
     while (i < pagina.n && reg->dados.chave > pagina.r[i - 1].dados.chave) {
         i++;
+        (cont->compChave)++;
     }
 
     // Verifica se encontrou a chave4
+    (cont->compChave)++;
     if (reg->dados.chave == pagina.r[i-1].dados.chave) {
        // printf("Chave encontrada: %d\n", reg->dados.chave);
         *reg = pagina.r[i-1];
@@ -197,6 +209,7 @@ bool pesquisaB(TipoRegistro *reg, long pos, FILE *arvoreB, TipoContador *cont) {
     }
 
     // Decide qual subarvore explorar em seguida
+    (cont->compChave)++;
     if (reg->dados.chave < pagina.r[i-1].dados.chave) {
         //printf("Descendo para a subarvore esquerda\n");
         return pesquisaB(reg, pagina.p[i-1],arvoreB,cont);
@@ -221,7 +234,7 @@ void imprime(FILE*arvoreb, int quantidade){
         printf("Pagina %ld:\n", i);
         printf("\tchaves: ");
         for(int j = 0; j < pagina.n; j++){
-            printf("%d ", pagina.r[j].dados.chave);
+            printf("%d ", pagina.r[j].chave);
         }
         printf("| filhos: ");
         for(int j = 0; j < pagina.n + 1; j++){  

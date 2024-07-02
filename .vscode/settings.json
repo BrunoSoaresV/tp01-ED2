@@ -5,6 +5,7 @@
         "struct.h": "c",
         "stdbool.h": "c",
         "stdio.h": "c",
-        "sequencial.h": "c"
+        "sequencial.h": "c",
+        "arvorebestrela.h": "c"
     }
 }

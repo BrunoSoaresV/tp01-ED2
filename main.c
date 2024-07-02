@@ -6,6 +6,7 @@
 #include "struct.h"
 #include "binaria.h"
 #include "arvoreB.h"
+#include "arvoreBestrela.h"
 #include <unistd.h>
 #include <time.h>
 #include <string.h>
@@ -62,6 +63,9 @@ int main(int argc, char *argv[]){
     long posRaiz;
     TipoRegistro regPesquisa;
     regPesquisa.dados.chave = chave;
+
+    //variaveis para uso do metodo 4 (arvore B*)
+    FILE *arvoreBestr;
 
     // Verifica se as entradas são válidas
     if(EntradaInvalida(argc, metodo, quantidade, situacao, chave) || ChaveInvalida(argv[4])){
@@ -159,6 +163,7 @@ int main(int argc, char *argv[]){
         posNaArvore = buscaBinariaI(arvore, 0, no, chave, &dado, &busca);
         end = clock();
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+
         if((arquivoContagens(chave, 2, quantidade, situacao, "arvBin\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore Binária)");
         }
@@ -190,8 +195,8 @@ int main(int argc, char *argv[]){
         fclose(arq);
 
 
-     // printf("Árvore iniciada\n");
-        printf("\nQuantidade: %d\n", quantidade);
+        // printf("Árvore iniciada\n");
+        //printf("\nQuantidade: %d\n", quantidade);
         //printf("posRaiz: %ld\n",posRaiz);
         // Abra novamente o arquivo da árvore B para leitura
         arvoreB = fopen("arvoreB.bin", "rb");
@@ -202,13 +207,17 @@ int main(int argc, char *argv[]){
             return 1;
         }
         if (pesquisaB(&regPesquisa, posRaiz, arvoreB, &busca)) {
-            printf("\n\nRegistro com chave %d\n encontrado: dado1 = %ld\n dado2 = %s\n dado3 = %s\n\n",regPesquisa.dados.chave, regPesquisa.dados.dado1, regPesquisa.dados.dado2, regPesquisa.dados.dado3);
+            printf("\n\nRegistro com chave %d encontrado\n\n",regPesquisa.dados.chave);
         } else {
             printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
         }
         end = clock();
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
         fclose(arvoreB);
+
+        if(flagP){
+            imprimeElemento(0, regPesquisa.dados);
+        }
 
         if((arquivoContagens(chave, 1, quantidade, situacao, "arvB\0",  construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construcao : Árvore B)");
@@ -217,10 +226,47 @@ int main(int argc, char *argv[]){
         if((arquivoContagens(chave, 2, quantidade, situacao, "arvB\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore B)");
         }
-
         break;
     case 4:
-        //Árvore B estrela
+        //Abrindo arquivo da arvore B*
+        arvoreBestr = fopen("arvoreBEstrela.bin", "wb+");
+        if (arvoreBestr == NULL) {
+            printf("Erro ao abrir arquivo da arvore B estrela\n");
+            fclose(arq); // Feche o arquivo de registros se falhar ao abrir o arquivo da árvore B
+            return 1;
+        }
+        //Constroi a arvore B*
+        start = clock();
+        iniciarTreeBEstrela( arq, arvoreBestr,quantidade, &posRaiz, &construcao);
+        end = clock();
+         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        fclose(arvoreBestr);
+        fclose(arq);
+        //Abrindo o arquivo da arvore B* de novo
+        arvoreBestr = fopen("arvoreBEstrela.bin", "rb");
+
+        start = clock();
+        if (arvoreBestr == NULL) {
+            printf("Erro ao abrir arquivo da árvore B estrela para leitura\n");
+            return 1;
+        }
+        if (pesquisaBEstrela(&regPesquisa, posRaiz, arvoreBestr, &busca)) {
+            printf("\n\nRegistro com chave %d\n encontrado: dado1 = %ld\n dado2 = %s\n dado3 = %s\n\n",regPesquisa.dados.chave, regPesquisa.dados.dado1, regPesquisa.dados.dado2, regPesquisa.dados.dado3);
+        } else {
+            printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
+        }
+        end = clock();
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        fclose(arvoreBestr);
+
+        if((arquivoContagens(chave, 1, quantidade, situacao, "arvBEstrela\0",  construcao)) == false){
+            printf("Erro ao gerar arquivo de contagens (Construcao : Árvore B Estrela)");
+        }
+
+        if((arquivoContagens(chave, 2, quantidade, situacao, "arvBEstrela\0",  busca)) == false){
+            printf("Erro ao gerar arquivo de contagens (Busca : Árvore B Estrela)");
+        }
+
         break;
     default:
         break;

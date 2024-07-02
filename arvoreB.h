@@ -4,15 +4,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "struct.h"
-#define M 50 //Minimo
-#define MM (M*2) //Maximo
+
 
 //typedef long TipoChave;
-
+/*
 typedef struct TipoRegistro{
   //  TipoChave chave;
     Registro dados;
-}TipoRegistro;
+}TipoRegistro;*/
 
 typedef struct TipoPagina{
     short n;//indica a quantidade de registro (itens) que tem dentro de cada página
