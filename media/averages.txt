@@ -1,0 +1,126 @@
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Cem/Crescente_Construcao:
+Leituras: 348.00
+Escritas: 104.00
+Transf T: 452.00
+Comparações: 3490.00
+Tempo_Total: 0.006008
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Mil/Crescente_Construcao:
+Leituras: 3983.00
+Escritas: 1074.00
+Transf T: 5057.00
+Comparações: 59260.00
+Tempo_Total: 0.066755
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/DezMil/Crescente_Construcao:
+Leituras: 48990.00
+Escritas: 10792.00
+Transf T: 59782.00
+Comparações: 847256.00
+Tempo_Total: 0.817268
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Cem/Crescente_Busca:
+Leituras: 2.00
+Escritas: 0.00
+Transf T: 2.00
+Comparações: 19.00
+Tempo_Total: 0.000056
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Mil/Crescente_Busca:
+Leituras: 2.00
+Escritas: 0.00
+Transf T: 2.00
+Comparações: 21.70
+Tempo_Total: 0.000083
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/DezMil/Crescente_Busca:
+Leituras: 2.80
+Escritas: 0.00
+Transf T: 2.80
+Comparações: 32.90
+Tempo_Total: 0.000131
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Cem/D_Construcao:
+Leituras: 348.00
+Escritas: 104.00
+Transf T: 452.00
+Comparações: 3467.00
+Tempo_Total: 0.005877
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Mil/D_Construcao:
+Leituras: 3983.00
+Escritas: 1074.00
+Transf T: 5057.00
+Comparações: 43042.00
+Tempo_Total: 0.066845
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/DezMil/D_Construcao:
+Leituras: 48990.00
+Escritas: 10792.00
+Transf T: 59782.00
+Comparações: 463439.00
+Tempo_Total: 0.815895
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Cem/D_Busca:
+Leituras: 2.00
+Escritas: 0.00
+Transf T: 2.00
+Comparações: 20.60
+Tempo_Total: 0.000055
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Mil/D_Busca:
+Leituras: 2.00
+Escritas: 0.00
+Transf T: 2.00
+Comparações: 25.50
+Tempo_Total: 0.000085
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/DezMil/D_Busca:
+Leituras: 3.00
+Escritas: 0.00
+Transf T: 3.00
+Comparações: 39.90
+Tempo_Total: 0.000163
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Cem/O_Construcao:
+Leituras: 348.00
+Escritas: 104.00
+Transf T: 452.00
+Comparações: 3485.00
+Tempo_Total: 0.006011
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Mil/O_Construcao:
+Leituras: 3973.00
+Escritas: 1054.00
+Transf T: 5027.00
+Comparações: 47855.00
+Tempo_Total: 0.070127
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/DezMil/O_Construcao:
+Leituras: 48341.00
+Escritas: 10574.00
+Transf T: 58915.00
+Comparações: 621806.00
+Tempo_Total: 1.006012
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/DezMil/O_Busca:
+Leituras: 3.00
+Escritas: 0.00
+Transf T: 3.00
+Comparações: 42.90
+Tempo_Total: 0.000131
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Cem/O_Busca:
+Leituras: 2.00
+Escritas: 0.00
+Transf T: 2.00
+Comparações: 14.80
+Tempo_Total: 0.000051
+
+Médias para /home/tliuth/Documents/ED2/tp01-ED2/contagens/arvB/Mil/O_Busca:
+Leituras: 2.00
+Escritas: 0.00
+Transf T: 2.00
+Comparações: 29.90
+Tempo_Total: 0.000072
+

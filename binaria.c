@@ -67,7 +67,6 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, TipoContador *cont){
             insere(dados[i], qtdItens, arvore, cont);
 
             qtdItens++;
-            printf("Quantidade de itens na árvore: %d\n", qtdItens);
             //Colocar um return booleano na insere, ou fazer a verificação de erro nela mesma?
         }
         paginaAtual++;

@@ -33,6 +33,7 @@ void iniciaContador(TipoContador *cont);
 char *retornaSituacao(int situacao);
 char *retornaQuantidade(int quantidade);
 void imprimeElemento(int pos, Registro dado);
+int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
 
@@ -43,6 +44,12 @@ int main(int argc, char *argv[]){
     int chave = atoi(argv[4]);
     int flagP = (argc == 6) ? atoi(argv[5]) : 0;
 
+    operador(metodo, quantidade, situacao, chave, flagP, argc, argv);
+
+    return 0;
+}
+
+int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int argc, char *argv[]){
     // variáveis para controle de transferências e de tempo
     TipoContador construcao, busca;
     iniciaContador(&construcao);
@@ -228,6 +235,8 @@ int main(int argc, char *argv[]){
         }
         break;
     case 4:
+        printf("oii\n\n");
+
         //Abrindo arquivo da arvore B*
         arvoreBestr = fopen("arvoreBEstrela.bin", "wb+");
         if (arvoreBestr == NULL) {
@@ -239,9 +248,10 @@ int main(int argc, char *argv[]){
         start = clock();
         iniciarTreeBEstrela( arq, arvoreBestr,quantidade, &posRaiz, &construcao);
         end = clock();
-         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
         fclose(arvoreBestr);
         fclose(arq);
+
         //Abrindo o arquivo da arvore B* de novo
         arvoreBestr = fopen("arvoreBEstrela.bin", "rb");
 
@@ -251,13 +261,17 @@ int main(int argc, char *argv[]){
             return 1;
         }
         if (pesquisaBEstrela(&regPesquisa, posRaiz, arvoreBestr, &busca)) {
-            printf("\n\nRegistro com chave %d\n encontrado: dado1 = %ld\n dado2 = %s\n dado3 = %s\n\n",regPesquisa.dados.chave, regPesquisa.dados.dado1, regPesquisa.dados.dado2, regPesquisa.dados.dado3);
+            printf("\n\nRegistro com chave %d encontrado.\n\n",regPesquisa.dados.chave);
         } else {
             printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
         }
         end = clock();
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
         fclose(arvoreBestr);
+
+        if(flagP){
+            imprimeElemento(0, regPesquisa.dados);
+        }
 
         if((arquivoContagens(chave, 1, quantidade, situacao, "arvBEstrela\0",  construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construcao : Árvore B Estrela)");
@@ -274,7 +288,6 @@ int main(int argc, char *argv[]){
 
     return 0;
 }
-
 
 bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int chave){
     //Tratamento de erros
@@ -312,6 +325,8 @@ bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int cha
     
     return false;
 }
+
+
 
 
 bool ChaveInvalida(const char *chave){

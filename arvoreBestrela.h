@@ -4,13 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-/*
-typedef int TipoChave;
 
-typedef struct TipoRegistro{
-    TipoChave chave;
-    Registro dados;
-}TipoRegistro;*/
 
 typedef enum {Interna,Externa} TipoIntExt;
 

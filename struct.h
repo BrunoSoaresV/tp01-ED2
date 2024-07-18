@@ -1,8 +1,8 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
-#define ITENSPAGINA 8
-#define M 25 //Minimo
+#define ITENSPAGINA 1000
+#define M 1000 //Minimo
 #define MM (M*2) //Maximo
 
 typedef int TipoChave;
