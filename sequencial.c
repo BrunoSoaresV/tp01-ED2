@@ -58,24 +58,24 @@ int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, Ti
     int i, quantitens;
     long desloc;
 
-    // Procura pela página onde o item pode se encontrar
+    // procura pela página onde o item pode se encontrar
     i = tam - 1;  // Start from the last index (since we're searching in decreasing order)
     while (i >= 0 && tab[i].chave >= item->chave) i--;
 
-    // Caso a chave desejada seja maior que a 1a chave, o item
+    // caso a chave desejada seja maior que a 1a chave, o item
     // não existe no arquivo
-    if (i == tam - 1) return 0;
+    if (i == tam-1) return 0;
 
     else {
-        // A última página pode não estar completa
+        // a ultima página pode não estar completa
         if (i >= 0) quantitens = ITENSPAGINA;
         else {
             fseek(arq, 0, SEEK_END);
             quantitens = (ftell(arq) / sizeof(Registro)) % ITENSPAGINA;
             if (quantitens == 0) quantitens = ITENSPAGINA;
         }
-        // Corrigir o cálculo do deslocamento
-        desloc = (i + 1) * ITENSPAGINA * sizeof(Registro);
+        // lê a página desejada do arquivo
+        desloc = (i+1) * ITENSPAGINA * sizeof(Registro);
 
         fseek(arq, desloc, SEEK_SET);
         fread(&pagina, sizeof(Registro), quantitens, arq);
@@ -90,7 +90,7 @@ int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, Ti
             if (pagina[meio].chave == item->chave) {
                 *item = pagina[meio];
                 return 1;
-            } else if (pagina[meio].chave > item->chave) {  // Comparação correta para ordem decrescente
+            } else if (pagina[meio].chave > item->chave) {  // For descending order
                 inicio = meio + 1;
             } else {
                 fim = meio - 1;
