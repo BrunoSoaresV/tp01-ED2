@@ -16,41 +16,77 @@ generate_random_chave() {
   echo $(((RANDOM*40) % QUANTIDADE))  # Change 100000 to the range you need
 }
 
-# Run the program multiple times
+# # Run the program multiple times
 
+# # for ((i=0; i<NUM_RUNS; i++)); do
+# #   CHAVE=$(generate_random_chave)
+# #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+# #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# # done
+
+# # QUANTIDADE=1000
+# # for ((i=0; i<NUM_RUNS; i++)); do
+# #   CHAVE=$(generate_random_chave)
+# #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+# #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# # done
+
+# # QUANTIDADE=10000
+# # for ((i=0; i<NUM_RUNS; i++)); do
+# #   CHAVE=$(generate_random_chave)
+# #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+# #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# # done
+
+# QUANTIDADE=100000
 # for ((i=0; i<NUM_RUNS; i++)); do
 #   CHAVE=$(generate_random_chave)
 #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
 #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
 # done
 
-# QUANTIDADE=1000
+# QUANTIDADE=1000000
 # for ((i=0; i<NUM_RUNS; i++)); do
 #   CHAVE=$(generate_random_chave)
-#   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+#   echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
 #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
 # done
 
-# QUANTIDADE=10000
+# SITUACAO=2
+# # QUANTIDADE=100
+# # for ((i=0; i<NUM_RUNS; i++)); do
+# #   CHAVE=$(generate_random_chave)
+# #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+# #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# # done
+
+# # QUANTIDADE=1000
+# # for ((i=0; i<NUM_RUNS; i++)); do
+# #   CHAVE=$(generate_random_chave)
+# #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+# #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# # done
+
+# # QUANTIDADE=10000
+# # for ((i=0; i<NUM_RUNS; i++)); do
+# #   CHAVE=$(generate_random_chave)
+# #   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+# #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# # done
+
+# QUANTIDADE=100000
 # for ((i=0; i<NUM_RUNS; i++)); do
 #   CHAVE=$(generate_random_chave)
-#   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+#   echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
 #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
 # done
 
-QUANTIDADE=100000
-for ((i=0; i<NUM_RUNS; i++)); do
-  CHAVE=$(generate_random_chave)
-  echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-  $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-done
-
-QUANTIDADE=1000000
-for ((i=0; i<NUM_RUNS; i++)); do
-  CHAVE=$(generate_random_chave)
-  echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-  $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-done
+# QUANTIDADE=1000000
+# for ((i=0; i<NUM_RUNS; i++)); do
+#   CHAVE=$(generate_random_chave)
+#   echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+#   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
+# done
 
 SITUACAO=2
 # QUANTIDADE=100
@@ -74,48 +110,12 @@ SITUACAO=2
 #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
 # done
 
-QUANTIDADE=100000
-for ((i=0; i<NUM_RUNS; i++)); do
-  CHAVE=$(generate_random_chave)
-  echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-  $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-done
-
-QUANTIDADE=1000000
-for ((i=0; i<NUM_RUNS; i++)); do
-  CHAVE=$(generate_random_chave)
-  echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-  $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-# done
-
-SITUACAO=3
-# QUANTIDADE=100
+# QUANTIDADE=100000
 # for ((i=0; i<NUM_RUNS; i++)); do
 #   CHAVE=$(generate_random_chave)
-#   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
+#   echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
 #   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
 # done
-
-# QUANTIDADE=1000
-# for ((i=0; i<NUM_RUNS; i++)); do
-#   CHAVE=$(generate_random_chave)
-#   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-#   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-# done
-
-# QUANTIDADE=10000
-# for ((i=0; i<NUM_RUNS; i++)); do
-#   CHAVE=$(generate_random_chave)
-#   echo "Running B with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-#   $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-# done
-
-QUANTIDADE=100000
-for ((i=0; i<NUM_RUNS; i++)); do
-  CHAVE=$(generate_random_chave)
-  echo "Running $PROGRAM_PATH with arguments: $METODO $QUANTIDADE $SITUACAO $CHAVE"
-  $PROGRAM_PATH $METODO $QUANTIDADE $SITUACAO $CHAVE
-done
 
 QUANTIDADE=1000000
 for ((i=0; i<NUM_RUNS; i++)); do
