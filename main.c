@@ -32,7 +32,7 @@ bool arquivoContagens(int chave, int fase, int qtd, int sit, char metodo[], Tipo
 void iniciaContador(TipoContador *cont);
 char *retornaSituacao(int situacao);
 char *retornaQuantidade(int quantidade);
-void imprimeElemento(int pos, Registro dado);
+void imprimeChaves(FILE* arq, int tamanho);
 int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
@@ -109,7 +109,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
                 printf ("Registro (codigo %d) foi localizado\n",x.chave);
 
                 if(flagP){ //O usuário optou por imprimir o resultado da busca
-                    imprimeElemento(0, x); // não há nada guardando a posição dele aq
+                    imprimeChaves(arq, quantidade); // não há nada guardando a posição dele aq
                 }
             }else{
                 printf ("Registro de código %d nao foi localizado\n",x.chave);
@@ -125,7 +125,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
                 printf ("Registro (codigo %d) foi localizado\n",x.chave);
                 // imprime elementos no terminal
                 if(flagP){
-                    imprimeElemento(0, x); // não há nada guardando a posição dele aq
+                    imprimeChaves(arq, quantidade); // não há nada guardando a posição dele aq
                 }
             }else{
                 printf ("Registro de código %d nao foi localizado\n",x.chave);
@@ -169,6 +169,8 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         end = clock(); //encerra a contagem de clocks da busca
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //armazena o tempo da busca em segundos
 
+        if(posNaArvore!=-1) printf("Registro com chave %d encontrado\n\n", dado.chave);
+
         //abre arquivo de contagens da busca
         if((arquivoContagens(chave, 2, quantidade, situacao, "arvBin\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore Binária)");
@@ -176,7 +178,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
 
         //se optado pelo usuário, imprime a chave buscada no terminal
         if(posNaArvore != -1 && flagP){
-            imprimeElemento(posNaArvore+1, dado);
+            imprimeChaves(arq, quantidade);
         }
 
         fclose(arvore);
@@ -198,7 +200,6 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         end = clock(); // fim da contagem de clocks da construção da árvore B
         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calculo do tempo de construção em segundos
         fclose(arvoreB);
-        fclose(arq);
 
         // Abra novamente o arquivo da árvore B para leitura
         arvoreB = fopen("arvoreB.bin", "rb");
@@ -206,6 +207,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         start = clock(); //inicio da contagem de clocks da busca da árvore B
         if (arvoreB == NULL) {
             printf("Erro ao abrir arquivo da árvore B para leitura\n");
+            fclose(arq); // Feche o arquivo de registros se houver falha
             return 1;
         }
         if (pesquisaB(&regPesquisa, posRaiz, arvoreB, &busca)) {
@@ -219,7 +221,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
 
         //se opção do usuário, imprime a chave buscada
         if(flagP){
-            imprimeElemento(0, regPesquisa.dados);
+            imprimeChaves(arq, quantidade);
         }
 
         //cria arquivo de contagens da construção
@@ -232,6 +234,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore B)");
         }
 
+        fclose(arq);
         break;
     
     //ÁRVORE B ESTRELA
@@ -251,7 +254,6 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         end = clock(); //fim da contagem de clocks da construção da árvore B*
         construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calculo do tempo de construção em segundos
         fclose(arvoreBestr);
-        fclose(arq);
 
         //Abrindo o arquivo da arvore B* de novo
         arvoreBestr = fopen("arvoreBEstrela.bin", "rb");
@@ -259,6 +261,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         start = clock(); //início da contagem de clocks da busca da árvore B*
         if (arvoreBestr == NULL) {
             printf("Erro ao abrir arquivo da árvore B estrela para leitura\n");
+            fclose(arq); // Feche o arquivo de registros se houver falha
             return 1;
         }
         if (pesquisaBEstrela(&regPesquisa, posRaiz, arvoreBestr, &busca)) {
@@ -272,7 +275,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
 
         //se for opção do usuário, imprime no terminal a chave buscada
         if(flagP){
-            imprimeElemento(0, regPesquisa.dados);
+            imprimeChaves(arq, quantidade);
         }
 
         //criação dos arquivos de contagem
@@ -283,6 +286,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         if((arquivoContagens(chave, 2, quantidade, situacao, "arvBEstrela\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore B Estrela)");
         }
+        fclose(arq);
 
         break;
 
@@ -357,17 +361,19 @@ FILE* abreArquivo(int situacao, int quantidade){
     char* situacaoStr;
     char* quantidadeStr;
 
+    // verificação adicional da situação
     if(situacao < 1 || situacao > 3){
         printf("Situação Inválida\n");
         return NULL;
     }
 
-    situacaoStr = retornaSituacao(situacao);
+    situacaoStr = retornaSituacao(situacao); // retorna uma string equivalente ao número da situação
 
-    quantidadeStr = retornaQuantidade(quantidade);
+    quantidadeStr = retornaQuantidade(quantidade); // retorna uma string equivalente à quantidade
 
     //com base nos parâmetros de entrada, gera o nome do arquivo de registros a ser aberto
     sprintf(filename, "registros/registros%s%s.bin", quantidadeStr, situacaoStr);
+    //abre o arquivo
     if((arq = fopen(filename, "rb")) == NULL){
         return NULL; 
     }
@@ -381,27 +387,31 @@ bool arquivoContagens(int chave, int fase, int qtd, int sit, char metodo[], Tipo
     char *qtdStr;
     char *sitStr;
 
-    qtdStr = retornaQuantidade(qtd);
-    sitStr = retornaSituacao(sit);
+    qtdStr = retornaQuantidade(qtd); // retorna uma string equivalente à quantidade
+    sitStr = retornaSituacao(sit); // retorna uma string equivalente ao número da situação
     if(!(strcmp(sitStr, ""))) sitStr = "Crescente";
     
+    // gera o nome do arquivo de contagens (as pastas devem existir para funcionar)
     sprintf(filename, "contagens/%s/%s/%s_%s", metodo, qtdStr, sitStr, fase == 1 ? "Construcao" : "Busca");
 
+    // se o arquivo já existe, apenas abre
     if(access(filename, F_OK) == 0){
         arq = fopen(filename, "a");
-    }else{
+    }else{ // o arquivo não existe. Então cria-se um arquivo com cabeçalho
         arq = fopen(filename, "w");
         if(arq == NULL) return false;
         fprintf(arq, "%-10s | %-10s | %-10s | %-15s | %-12s | %-12s\n", "Chave", "Leituras", "Escritas", "Transf T", "Comparações", "Tempo_Total");
     }
     if(arq == NULL) return false;
 
+    //Imprime os valores no arquivo (num. de leituras, de escritas, leituras + escritas, comparações entre chaves e tempo)
     fprintf(arq, "%-10d | %-10ld | %-10ld | %-15ld | %-12ld | %-12lf\n", chave, cont.leitura, cont.escrita, cont.leitura + cont.escrita, cont.compChave, cont.tempo);
     fclose(arq);
     return true;
 }
 
 char *retornaSituacao(int situacao){
+    // retorna uma string de acordo com a situação estabelecida nos parâmetros de entrada
     char *sitStr;
     switch (situacao)
     {
@@ -422,6 +432,7 @@ char *retornaSituacao(int situacao){
 }
 
 char *retornaQuantidade(int quantidade){
+    // retorna uma string de acordo com a quantidade de registros estabelecida nos parâmetros de entrada
     char *quantidadeStr;
     switch (quantidade)
     {
@@ -450,11 +461,18 @@ char *retornaQuantidade(int quantidade){
 }
 
 void iniciaContador(TipoContador *cont){
+    // inicializa o contador com zeros
     (*cont).leitura = 0;
     (*cont).escrita = 0;
     (*cont).compChave = 0;
 }
 
-void imprimeElemento(int pos, Registro dado){
-    printf("Chave: %d\n", dado.chave);
+void imprimeChaves(FILE* arq, int tamanho){
+    Registro dado;
+    fseek(arq, SEEK_SET, 0);
+    printf("Entrou em imprime chaves\n\n");
+    for(int i = 0; i < tamanho; i++){
+        fread(&dado, sizeof(dado), 1, arq);
+        printf("%d ", dado.chave);
+    }
 }
