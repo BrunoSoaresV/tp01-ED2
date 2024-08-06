@@ -68,7 +68,6 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, TipoContador *cont){
     }
     fclose(arvore);
     fclose(txtFile);
-    printf("Arquivo árvore gerado com sucesso!\n");
     return true; //Arquivo árvore gerado com sucesso
 }
 
@@ -173,61 +172,32 @@ bool insere(Registro dado, int qtdItens, FILE* arvore, TipoContador *cont){
 }
 
 
-int buscaBinaria(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, long int *leit, int depth){
-    printf("Depth: %d\n", depth);
-    depth++;
-    // move o ponteiro do arquivo para o nó que será lido
-    fseek(arvore, posAtual * sizeof(tNo), SEEK_SET);
-
-    // lê o dado armazenado na posição
-    if(fread(&no, sizeof(tNo), 1, arvore) == 0){
-        printf("Erro na leitura do arquivo da árvore\n");
-        return -1;
-    }else (*leit)++;
-
-    // compara a chave lida com a chave buscada
-    if(no.dados.chave == chave){
-        *dado = no.dados;
-        return posAtual;
-    
-    // se a chave buscada for maior, continua buscando à direita
-    }else if(no.dados.chave < chave){
-        if(no.dir == -1 ){ // não há mais onde buscar, o elemento não está presente
-            printf("O elemento de chave %d não está presente no arquivo\n", chave);
-            return -1;
-        }else{
-            return buscaBinaria(arvore, no.dir, no, chave, dado, leit, depth);
-        }
-
-    // se a chave buscada for menor, continua buscando à esquerda
-    }else{
-        if(no.esq == -1){ // não há mais onde buscar, o elemento não está presente
-            printf("O elemento de chave %d não está presente no arquivo\n", chave);
-            return -1;
-        }
-        return buscaBinaria(arvore, no.esq, no, chave, dado, leit, depth); 
-    }
-}
-
 int buscaBinariaI(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado, TipoContador *cont){
     
+     // Loop enquanto a posição atual não for -1 (indicando o final da busca)
     while(posAtual != -1){
+        // Move o ponteiro do arquivo para a posição atual do nó
         fseek(arvore, posAtual * sizeof(tNo), SEEK_SET);
 
+        // Lê o nó da posição atual do arquivo
         if(fread(&no, sizeof(tNo), 1, arvore) == 0){
             printf("Erro na leitura do arquivo da árvore\n");
             return -1;
         }else (*cont).leitura++;
 
+
+         // Se a chave do nó lido for igual à chave procurada
         if(no.dados.chave == chave){
-            *dado = no.dados;
+            *dado = no.dados; // Armazena os dados do nó encontrado no ponteiro dado e retorna a posição atual
             return posAtual;
         }
         
+        // Se a chave do nó lido for menor que a chave procurada
         if(no.dados.chave < chave){
             
-            posAtual = no.dir;
+            posAtual = no.dir; // Atualiza a posição atual para o filho direito
         }else{
+             // Caso contrário, atualiza a posição atual para o filho esquerdo
             posAtual = no.esq;
         }
 
