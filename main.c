@@ -108,8 +108,8 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
             if (pesquisaCrescente (tabela, pos, &x, arq, &busca)){ //realiza a busca sequencial em arquivo ordenado crescente
                 printf ("Registro (codigo %d) foi localizado\n",x.chave);
 
-                if(flagP){ //O usuário optou por imprimir o resultado da busca
-                    imprimeChaves(arq, quantidade); // não há nada guardando a posição dele aq
+                if(flagP){ //se for opção do usuário, imprime no terminal as chaves do arquivo
+                    imprimeChaves(arq, quantidade); 
                 }
             }else{
                 printf ("Registro de código %d nao foi localizado\n",x.chave);
@@ -123,9 +123,9 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
             start = clock(); //inicia contagem de tempo da busca
             if (pesquisaDecrescente (tabela, pos, &x, arq, &busca)){ //realiza a busca sequencial em arquivo ordenado decrescente
                 printf ("Registro (codigo %d) foi localizado\n",x.chave);
-                // imprime elementos no terminal
+                //se for opção do usuário, imprime no terminal as chaves do arquivo
                 if(flagP){
-                    imprimeChaves(arq, quantidade); // não há nada guardando a posição dele aq
+                    imprimeChaves(arq, quantidade);
                 }
             }else{
                 printf ("Registro de código %d nao foi localizado\n",x.chave);
@@ -176,7 +176,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore Binária)");
         }
 
-        //se optado pelo usuário, imprime a chave buscada no terminal
+        //se for opção do usuário, imprime no terminal as chaves do arquivo
         if(posNaArvore != -1 && flagP){
             imprimeChaves(arq, quantidade);
         }
@@ -219,7 +219,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calculo do tempo de busca em segundos
         fclose(arvoreB);
 
-        //se opção do usuário, imprime a chave buscada
+        //se for opção do usuário, imprime no terminal as chaves do arquivo
         if(flagP){
             imprimeChaves(arq, quantidade);
         }
@@ -273,7 +273,7 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //cálculo do tempo de busca em segundos
         fclose(arvoreBestr);
 
-        //se for opção do usuário, imprime no terminal a chave buscada
+        //se for opção do usuário, imprime no terminal as chaves do arquivo
         if(flagP){
             imprimeChaves(arq, quantidade);
         }
@@ -468,9 +468,9 @@ void iniciaContador(TipoContador *cont){
 }
 
 void imprimeChaves(FILE* arq, int tamanho){
+    // itera pelo arquivo de origem imprimindo todas as chaves
     Registro dado;
     fseek(arq, SEEK_SET, 0);
-    printf("Entrou em imprime chaves\n\n");
     for(int i = 0; i < tamanho; i++){
         fread(&dado, sizeof(dado), 1, arq);
         printf("%d ", dado.chave);
