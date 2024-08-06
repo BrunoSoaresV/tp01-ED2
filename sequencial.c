@@ -61,11 +61,8 @@ int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, Ti
 
     // procura pela página onde o item pode se encontrar
     i = 0; 
-    while (i < tam && tab[i].chave >= item->chave){
-        printf("Chave atual: %d\n", tab[i].chave);
-        printf("i: %d\n", i);
-        i++;
-    }
+    while (i < tam && tab[i].chave >= item->chave) i++;
+    
 
     // caso a chave desejada seja maior que a 1a chave, o item
     // não existe no arquivo

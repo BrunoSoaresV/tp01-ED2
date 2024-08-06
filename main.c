@@ -94,34 +94,34 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         tabela = (tipoindice*) malloc(quantidade * sizeof(tipoindice));
         
         // gera tabela de índices
-        start = clock();
-        geraTabela(tabela, &pos, x, arq, &construcao);
-        end = clock();
-        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
-        arquivoContagens(chave, 1, quantidade, situacao, "sequencial", construcao);
+        start = clock(); //inicia contagem de tempo da geração da tabela
+        geraTabela(tabela, &pos, x, arq, &construcao); //Gera a tabela de índices
+        end = clock(); //encerra contagem de tempó da geração da tabela
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calcula o tempo de geração da tabela em segundos
+        arquivoContagens(chave, 1, quantidade, situacao, "sequencial", construcao); //armazena os dados da geração da tabela em um arquivo
 
         // ativa a função de pesquisa
-
         switch (situacao)
         {
-        case 1:
-            start = clock();
-            if (pesquisaCrescente (tabela, pos, &x, arq, &busca)){
+        case 1: //Arquivo crescente
+            start = clock(); //inicia contagem de tempo da busca
+            if (pesquisaCrescente (tabela, pos, &x, arq, &busca)){ //realiza a busca sequencial em arquivo ordenado crescente
                 printf ("Registro (codigo %d) foi localizado\n",x.chave);
-                // imprime elementos no terminal
-                if(flagP){
+
+                if(flagP){ //O usuário optou por imprimir o resultado da busca
                     imprimeElemento(0, x); // não há nada guardando a posição dele aq
                 }
             }else{
                 printf ("Registro de código %d nao foi localizado\n",x.chave);
             }
-            end = clock();
-            busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            end = clock(); //encerra contagem de tempo da busca
+            busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calcula o tempo de busca em segundos
             break;
         
-        case 2:
-            start = clock();
-            if (pesquisaDecrescente (tabela, pos, &x, arq, &busca)){
+        case 2: //arquivo decrescente
+            start = clock(); //inicia contagem de tempo da busca
+            if (pesquisaDecrescente (tabela, pos, &x, arq, &busca)){ //realiza a busca sequencial em arquivo ordenado decrescente
                 printf ("Registro (codigo %d) foi localizado\n",x.chave);
                 // imprime elementos no terminal
                 if(flagP){
@@ -130,62 +130,61 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
             }else{
                 printf ("Registro de código %d nao foi localizado\n",x.chave);
             }
-            end = clock();
-            busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            end = clock(); //encerra a contagem de tempo da busca
+            busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calcula o tempo de busca em segundos
             break;
-        }
+        }//FIM DO SWITCH DE PESQUISA
 
-        arquivoContagens(chave, 2, quantidade, situacao, "sequencial", busca);
+        arquivoContagens(chave, 2, quantidade, situacao, "sequencial", busca); // armazena os dados da busca em um arquivo
 
-
+        free(tabela);
         fclose (arq);
         
         break;
     
-    // organização e pesquisa por árvore binária
-    case 2:
+    case 2: //ÁRVORE BINÁRIA
         x.chave = chave;
 
         // gera a árvore binária
-        start = clock();
-        geraArquivoBinaria(arq, quantidade, &construcao); 
-        end = clock();
-        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        start = clock(); //inicia a contagem de clocks da geração da árvore binária
+        geraArquivoBinaria(arq, quantidade, &construcao); //gera a árvore binária de pesquisa
+        end = clock(); //encerra a contagem de clocks da geração da árvore binária
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calcula o tempo de construção em segundos
 
         if((arquivoContagens(chave, 1, quantidade, situacao, "arvBin\0", construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construção : Árvore Binária)");
         }
 
+        // abre o arquivo da árvore binária
         if((arvore = fopen("treefile.bin", "rb")) == NULL){
             printf("Erro na abertura do arquivo árvore pela main\n");
             return 0;
         }
         
-        printf("Iniciando ImprimeÁrvore\n");
-        imprimeArvore(arvore, quantidade);
-        printf("ImprimeArvore concluído\n");
 
         // busca o arquivo na árvore
-        start = clock();
-        posNaArvore = buscaBinariaI(arvore, 0, no, chave, &dado, &busca);
-        end = clock();
-        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        start = clock(); //inicia a contagem de clocks da busca
+        posNaArvore = buscaBinariaI(arvore, 0, no, chave, &dado, &busca); //realiza a busca na árvore de forma iterativa
+        end = clock(); //encerra a contagem de clocks da busca
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //armazena o tempo da busca em segundos
 
+        //abre arquivo de contagens da busca
         if((arquivoContagens(chave, 2, quantidade, situacao, "arvBin\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore Binária)");
         }
 
+        //se optado pelo usuário, imprime a chave buscada no terminal
         if(posNaArvore != -1 && flagP){
             imprimeElemento(posNaArvore+1, dado);
         }
 
         fclose(arvore);
         fclose(arq);
-        
-
-        //árvore binária
         break;
-    case 3:
+
+    case 3: //ÁRVORE B   
+        //abre arquivo para montar árvore B
         arvoreB = fopen("arvoreB.bin", "wb+");
         if (arvoreB == NULL) {
             printf("Erro ao abrir arquivo da árvore B\n");
@@ -194,21 +193,17 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         }
     
         // Constroi a árvore B
-        start = clock();
+        start = clock(); //inicio da contagem de clocks da construção da árvore B
         iniciarTreeB(arq, arvoreB, quantidade,&posRaiz, &construcao);
-        end = clock();
-        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        end = clock(); // fim da contagem de clocks da construção da árvore B
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calculo do tempo de construção em segundos
         fclose(arvoreB);
         fclose(arq);
 
-
-        // printf("Árvore iniciada\n");
-        //printf("\nQuantidade: %d\n", quantidade);
-        //printf("posRaiz: %ld\n",posRaiz);
         // Abra novamente o arquivo da árvore B para leitura
         arvoreB = fopen("arvoreB.bin", "rb");
 
-        start = clock();
+        start = clock(); //inicio da contagem de clocks da busca da árvore B
         if (arvoreB == NULL) {
             printf("Erro ao abrir arquivo da árvore B para leitura\n");
             return 1;
@@ -218,24 +213,29 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         } else {
             printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
         }
-        end = clock();
-        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        end = clock(); //fim da contagem de clocks da busca da árvore B
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calculo do tempo de busca em segundos
         fclose(arvoreB);
 
+        //se opção do usuário, imprime a chave buscada
         if(flagP){
             imprimeElemento(0, regPesquisa.dados);
         }
 
+        //cria arquivo de contagens da construção
         if((arquivoContagens(chave, 1, quantidade, situacao, "arvB\0",  construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construcao : Árvore B)");
         }
 
+        //cria arquivo de contagens da busca
         if((arquivoContagens(chave, 2, quantidade, situacao, "arvB\0",  busca)) == false){
             printf("Erro ao gerar arquivo de contagens (Busca : Árvore B)");
         }
+
         break;
+    
+    //ÁRVORE B ESTRELA
     case 4:
-        printf("oii\n\n");
 
         //Abrindo arquivo da arvore B*
         arvoreBestr = fopen("arvoreBEstrela.bin", "wb+");
@@ -244,18 +244,19 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
             fclose(arq); // Feche o arquivo de registros se falhar ao abrir o arquivo da árvore B
             return 1;
         }
+
         //Constroi a arvore B*
-        start = clock();
-        iniciarTreeBEstrela( arq, arvoreBestr,quantidade, &posRaiz, &construcao);
-        end = clock();
-        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        start = clock(); //início da contagem de clocks da construção da árvore B*
+        iniciarTreeBEstrela( arq, arvoreBestr,quantidade, &posRaiz, &construcao); //constrói a árvore B*
+        end = clock(); //fim da contagem de clocks da construção da árvore B*
+        construcao.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //calculo do tempo de construção em segundos
         fclose(arvoreBestr);
         fclose(arq);
 
         //Abrindo o arquivo da arvore B* de novo
         arvoreBestr = fopen("arvoreBEstrela.bin", "rb");
 
-        start = clock();
+        start = clock(); //início da contagem de clocks da busca da árvore B*
         if (arvoreBestr == NULL) {
             printf("Erro ao abrir arquivo da árvore B estrela para leitura\n");
             return 1;
@@ -265,14 +266,16 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         } else {
             printf("Registro com chave %d não encontrado\n", regPesquisa.dados.chave);
         }
-        end = clock();
-        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC;
+        end = clock(); //fim da contagem de clocks da busca da árvore B*
+        busca.tempo = ((double) (end - start)) / CLOCKS_PER_SEC; //cálculo do tempo de busca em segundos
         fclose(arvoreBestr);
 
+        //se for opção do usuário, imprime no terminal a chave buscada
         if(flagP){
             imprimeElemento(0, regPesquisa.dados);
         }
 
+        //criação dos arquivos de contagem
         if((arquivoContagens(chave, 1, quantidade, situacao, "arvBEstrela\0",  construcao)) == false){
             printf("Erro ao gerar arquivo de contagens (Construcao : Árvore B Estrela)");
         }
@@ -282,12 +285,13 @@ int operador(int metodo,int quantidade,int situacao,int chave,int flagP, int arg
         }
 
         break;
+
     default:
         break;
     }
 
     return 0;
-}
+}//FIM OPERADOR
 
 bool EntradaInvalida(int argc, int metodo, int quantidade, int situacao, int chave){
     //Tratamento de erros
@@ -362,6 +366,7 @@ FILE* abreArquivo(int situacao, int quantidade){
 
     quantidadeStr = retornaQuantidade(quantidade);
 
+    //com base nos parâmetros de entrada, gera o nome do arquivo de registros a ser aberto
     sprintf(filename, "registros/registros%s%s.bin", quantidadeStr, situacaoStr);
     if((arq = fopen(filename, "rb")) == NULL){
         return NULL; 
@@ -451,10 +456,5 @@ void iniciaContador(TipoContador *cont){
 }
 
 void imprimeElemento(int pos, Registro dado){
-    printf("\nO elemento procurado está na posição %d\n", pos);
-    printf("O elemento buscado é:\n");
     printf("Chave: %d\n", dado.chave);
-    printf("Dado1: %ld\n", dado.dado1);
-    printf("Dado2: %.10s...\n", dado.dado2);
-    printf("Dado3: %.10s...\n", dado.dado3);
 }

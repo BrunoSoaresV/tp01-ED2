@@ -244,27 +244,3 @@ int buscaBinariaI(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado,
     return -1;
 }
 
-// Imprime a árvore binária em um arquivo, no formato texto
-void imprimeArvore(FILE* arvore, int qtd){
-    FILE* txtFile;
-    tNo no;
-
-    // abre o arquivo texto
-    if((txtFile = fopen("treefile.txt", "w")) == NULL){
-        printf("Erro ao abrir arquivo para leitura (imprimeArvore)\n");
-    }
-
-    // imprime os dados da árvore
-    for(int i = 0; i < qtd; i++){
-        if(fread(&no, 1, sizeof(tNo), arvore) == -1){
-            printf("Erro lendo da árvore (imprimeArvore)\n");
-        }
-        fprintf(txtFile, "Registro %d:\n", i);
-        fprintf(txtFile, "Chave: %d\n", no.dados.chave);
-        fprintf(txtFile, "Dado1: %ld\n", no.dados.dado1);
-        fprintf(txtFile, "Dado2: %.10s\n", no.dados.dado2);
-        fprintf(txtFile, "Dado3: %.10s\n", no.dados.dado3);
-        fprintf(txtFile, "Dir: %d\n", no.dir);
-        fprintf(txtFile, "Esq: %d\n\n", no.esq);
-    }
-}
