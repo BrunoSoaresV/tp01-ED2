@@ -26,7 +26,6 @@ int pesquisaCrescente (tipoindice tab[], int tam, Registro* item, FILE *arq, Tip
         }
         // lê a página desejada do arquivo
         desloc = (i-1)*ITENSPAGINA*sizeof(Registro);
-
         fseek (arq, desloc, SEEK_SET);
         fread (&pagina, sizeof(Registro), quantitens, arq);
         (*cont).leitura++;
@@ -63,7 +62,6 @@ int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, Ti
     i = 0; 
     while (i < tam && tab[i].chave >= item->chave) i++;
     
-
     // caso a chave desejada seja maior que a 1a chave, o item
     // não existe no arquivo
     if (i == 0) return 0;
@@ -78,8 +76,6 @@ int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, Ti
         }
         // lê a página desejada do arquivo
         desloc = (i-1) * ITENSPAGINA * sizeof(Registro);
-        printf("deslocamento: %d\n", (i+1) * ITENSPAGINA);
-
         fseek(arq, desloc, SEEK_SET);
         fread(&pagina, sizeof(Registro), quantitens, arq);
         (*cont).leitura++;
@@ -107,11 +103,17 @@ int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, Ti
 
 
 void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq, TipoContador *cont) {
-    *pos = 0;
+    *pos = 0; // Inicializa a posicao da tabela com zero
+
+    // Loop que lê todos os registros do arquivo
     while (fread(&x, sizeof(x), 1, arq) == 1) {
         (*cont).leitura++;
+
+        // Atribui a chave do registro lido a tabela de índices
         tabela[*pos].chave = x.chave;
+
         (*pos)++;
+        // Move o ponteiro do arquivo para a primeira posicao da proxima pagina
         fseek(arq, (ITENSPAGINA-1)* sizeof(x), 1);
     } 
 }

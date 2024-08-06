@@ -8,8 +8,11 @@ typedef struct {
     int chave;
 } tipoindice;
 
+// Funções responsaveis pelas pesquisas em ordem crescente e descrescente respectivamente
 int pesquisaCrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, TipoContador *busca);
 int pesquisaDecrescente(tipoindice tab[], int tam, Registro* item, FILE *arq, TipoContador *busca);
-void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq, TipoContador *construcao);
+
+// Função que gera uma tabela de indices a partir de um arquivo
+void geraTabela(tipoindice tabela[], int *pos, Registro x, FILE *arq, TipoContador *construcao); 
 
 #endif

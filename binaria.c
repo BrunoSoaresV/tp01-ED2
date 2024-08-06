@@ -29,7 +29,6 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, TipoContador *cont){
     Registro dados[ITENSPAGINA];
     FILE* arvore;
     FILE* txtFile;
-    long tamanho;
     
 
     //São definidas algumas variáveis de controle de fluxo
@@ -47,11 +46,6 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, TipoContador *cont){
         return false;
     }
 
-    tamanho = calcularQuantidadeRegistros(origem);
-    printf("O arquivo contém %ld registros\n\n", tamanho);
-
-    printf("Gerando arquivo da árvore binária\n");
-
     while(paginaAtual < totalPaginas){
         if(paginaAtual == totalPaginas - 1) qtdItensPag = quantidade - (paginaAtual*ITENSPAGINA);
         if(qtdItensPag == 0) qtdItensPag = ITENSPAGINA;
@@ -64,10 +58,10 @@ bool geraArquivoBinaria(FILE* origem, int quantidade, TipoContador *cont){
         }else ((*cont).leitura)++;
 
         for(int i = 0; i < qtdItensPag; i++) {
-            insere(dados[i], qtdItens, arvore, cont);
+            if(!insere(dados[i], qtdItens, arvore, cont))
+                printf("Erro na insere|binaria.c\n");
 
             qtdItens++;
-            printf("Quantidade de itens na árvore: %d\n", qtdItens);
             //Colocar um return booleano na insere, ou fazer a verificação de erro nela mesma?
         }
         paginaAtual++;
@@ -243,4 +237,3 @@ int buscaBinariaI(FILE* arvore, int posAtual, tNo no, int chave, Registro *dado,
     printf("Elemento de chave %d não está presente no arquivo.\n", chave);
     return -1;
 }
-
