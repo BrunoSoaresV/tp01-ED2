@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "ctype.h": "c",
+        "stdlib.h": "c",
+        "struct.h": "c",
+        "stdbool.h": "c",
+        "stdio.h": "c",
+        "sequencial.h": "c",
+        "arvorebestrela.h": "c"
+    }
+}
